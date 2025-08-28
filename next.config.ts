@@ -5,7 +5,25 @@ const nextConfig: NextConfig = {
   
   // Next.js 15+ 已移除开发者指示器配置
 
-  // GitHub Pages部署配置
+  // 生产环境配置
+  ...(process.env.NODE_ENV === 'production' && {
+    // 允许混合内容（HTTPS调用HTTP API）
+    async headers() {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: "upgrade-insecure-requests",
+            },
+          ],
+        },
+      ];
+    },
+  }),
+
+  // 静态导出配置
   output: 'export',
   trailingSlash: true,
   images: {
