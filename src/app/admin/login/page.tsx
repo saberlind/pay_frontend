@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", boxSizing: "border-box" }}>
             {error && (
               <div
                 style={{
@@ -121,6 +121,10 @@ export default function AdminLoginPage() {
                   display: "flex",
                   alignItems: "center",
                   gap: "0.5rem",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  maxWidth: "100%",
+                  overflow: "hidden",
                 }}
               >
                 <div
@@ -132,7 +136,9 @@ export default function AdminLoginPage() {
                     flexShrink: 0,
                   }}
                 ></div>
-                {error}
+                <span style={{ flex: 1, wordBreak: "break-word" }}>
+                  {error}
+                </span>
               </div>
             )}
 
