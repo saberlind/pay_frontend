@@ -1,5 +1,13 @@
 // API 配置和请求工具函数
+// 强制使用HTTP避免SSL错误
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://129.211.92.125:1009/api';
+
+// 在生产环境确保使用HTTP
+const getApiUrl = () => {
+  const url = API_BASE_URL;
+  // 确保在Vercel部署时使用正确的协议
+  return url.replace('https://', 'http://');
+};
 
 interface ApiResponse<T> {
   success: boolean;
@@ -46,7 +54,7 @@ async function request<T>(
     ...options,
   };
 
-  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  const fullUrl = `${getApiUrl()}${endpoint}`;
   console.log("发起API请求:", fullUrl, "配置:", config);
 
   const response = await fetch(fullUrl, config);
@@ -186,7 +194,7 @@ export const notificationApi = {
     }
 
     // 创建SSE连接，由于EventSource不支持自定义headers，我们通过URL参数传递token
-    const sseUrl = `${API_BASE_URL}/notifications/connect/${phone}?token=${encodeURIComponent(token)}`;
+    const sseUrl = `${getApiUrl()}/notifications/connect/${phone}?token=${encodeURIComponent(token)}`;
     console.log('建立SSE连接:', sseUrl);
     
     const eventSource = new EventSource(sseUrl);
