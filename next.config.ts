@@ -14,9 +14,11 @@ const nextConfig: NextConfig = {
     unoptimized: true
   },
   
-  // 如果部署到子路径，需要设置basePath和assetPrefix
-  // basePath: '/your-repository-name',
-  // assetPrefix: '/your-repository-name/',
+  // GitHub Pages配置
+  ...(process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS && {
+    basePath: '/pay_frontend',
+    assetPrefix: '/pay_frontend/',
+  }),
 };
 
 export default nextConfig;
