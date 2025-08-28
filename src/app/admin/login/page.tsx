@@ -325,10 +325,10 @@ export default function AdminLoginPage() {
               textDecoration: "none",
             }}
             onMouseOver={(e) => {
-              e.target.style.color = "white";
+              (e.target as HTMLElement).style.color = "white";
             }}
             onMouseOut={(e) => {
-              e.target.style.color = "rgba(255, 255, 255, 0.9)";
+              (e.target as HTMLElement).style.color = "rgba(255, 255, 255, 0.9)";
             }}
           >
             ← 返回首页

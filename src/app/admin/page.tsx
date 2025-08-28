@@ -312,10 +312,10 @@ export default function AdminPage() {
                   boxSizing: "border-box",
                 }}
                 onMouseOver={(e) => {
-                  if (!loading) e.target.style.backgroundColor = "#1D4ED8";
+                  if (!loading) (e.target as HTMLElement).style.backgroundColor = "#1D4ED8";
                 }}
                 onMouseOut={(e) => {
-                  if (!loading) e.target.style.backgroundColor = "#2563EB";
+                  if (!loading) (e.target as HTMLElement).style.backgroundColor = "#2563EB";
                 }}
               >
                 <Search style={{ width: "16px", height: "16px" }} />
@@ -528,10 +528,10 @@ export default function AdminPage() {
                   boxSizing: "border-box",
                 }}
                 onMouseOver={(e) => {
-                  if (!loading && formData.phone) e.target.style.backgroundColor = "#C2410C";
+                  if (!loading && formData.phone) (e.target as HTMLElement).style.backgroundColor = "#C2410C";
                 }}
                 onMouseOut={(e) => {
-                  if (!loading && formData.phone) e.target.style.backgroundColor = "#EA580C";
+                  if (!loading && formData.phone) (e.target as HTMLElement).style.backgroundColor = "#EA580C";
                 }}
               >
                 <Plus style={{ width: "16px", height: "16px" }} />

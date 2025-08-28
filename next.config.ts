@@ -3,17 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   
-  // 禁用开发者工具浮窗
-  devIndicators: {
-    buildActivity: false,
-    buildActivityPosition: 'bottom-right',
-  },
-  
-  // 也可以通过实验性配置完全禁用 overlay
-  experimental: {
-    // 注意：这可能会影响错误显示，谨慎使用
-    devOverlay: false
-  },
+  // Next.js 15+ 已移除开发者指示器配置
 
   // GitHub Pages部署配置
   output: 'export',
