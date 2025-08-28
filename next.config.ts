@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   },
   
   // GitHub Pages配置
-  ...(process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS && {
+  ...(process.env.GITHUB_ACTIONS === 'true' && {
     basePath: '/pay_frontend',
     assetPrefix: '/pay_frontend/',
   }),

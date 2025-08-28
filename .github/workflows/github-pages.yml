@@ -36,11 +36,9 @@ jobs:
             ${{ runner.os }}-node-
       
       - name: Install dependencies
-        working-directory: frontend
         run: npm ci
       
       - name: Build
-        working-directory: frontend
         env:
           NEXT_PUBLIC_API_URL: http://129.211.92.125:1009/api
         run: npm run build
@@ -48,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/out
+          path: out
 
   deploy:
     environment:
