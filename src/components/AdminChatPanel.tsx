@@ -120,19 +120,32 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
 
   // 处理SSE聊天消息
   const handleChatMessage = (data: any) => {
-    console.log('管理员收到聊天消息:', data);
+    console.log('AdminChatPanel收到聊天消息:', data);
+    console.log('AdminChatPanel消息数据类型:', typeof data);
     
     try {
-      const messageData = typeof data === 'string' ? JSON.parse(data) : data;
+      // 数据应该已经在管理员页面被解析过，这里直接使用
+      const messageData = data;
+      console.log('AdminChatPanel处理消息数据:', messageData);
+      console.log('消息类型:', messageData.type);
+      console.log('消息发送者:', messageData.sender);
+      console.log('消息接收者:', messageData.receiver);
+      console.log('当前选中会话:', selectedSession?.apiKey);
       
       if (messageData.type === 'new_message') {
+        console.log('✅ 管理员确认收到新消息，准备添加到列表');
+        
         // 添加新消息到列表
         setMessages(prev => {
           // 避免重复添加
           const exists = prev.some(msg => msg.id === messageData.id);
-          if (exists) return prev;
+          console.log('检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          if (exists) {
+            console.log('消息已存在，跳过添加');
+            return prev;
+          }
           
-          return [...prev, {
+          const newMessage = {
             id: messageData.id,
             apiKey: messageData.apiKey,
             sender: messageData.sender,
@@ -142,7 +155,17 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
             isRead: false,
             createdAt: messageData.createdAt,
             updatedAt: messageData.createdAt
-          }];
+          };
+          
+          console.log('✅ 管理员成功添加新消息到列表:', newMessage);
+          const updatedMessages = [...prev, newMessage];
+          
+          // 自动滚动到底部
+          setTimeout(() => {
+            scrollToBottom();
+          }, 100);
+          
+          return updatedMessages;
         });
 
         // 如果是接收到的消息（用户发给管理员的）

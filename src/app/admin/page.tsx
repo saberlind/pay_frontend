@@ -72,21 +72,15 @@ export default function AdminPage() {
 
     console.log('管理员页面解析后的消息数据:', messageData);
 
-    switch (messageData.type) {
-      case 'chat_message':
-        // 处理聊天消息
-        console.log("管理员收到聊天消息:", messageData);
-        
-        // 触发自定义事件，让AdminChatPanel组件处理
-        const chatEvent = new CustomEvent('sse-chat-message', {
-          detail: messageData
-        });
-        window.dispatchEvent(chatEvent);
-        break;
-      default:
-        console.log('管理员收到未知类型消息:', messageData);
-        break;
-    }
+    // 注意：这里的messageData已经是聊天消息的内容，不需要再检查type
+    // SSE事件名称本身就是 'chat_message'，所以 messageData 就是具体的消息数据
+    console.log("管理员收到聊天消息:", messageData);
+    
+    // 直接触发自定义事件，让AdminChatPanel组件处理
+    const chatEvent = new CustomEvent('sse-chat-message', {
+      detail: messageData // messageData 包含 {id, apiKey, sender, receiver, content, createdAt, type: "new_message"}
+    });
+    window.dispatchEvent(chatEvent);
   };
 
   useEffect(() => {
