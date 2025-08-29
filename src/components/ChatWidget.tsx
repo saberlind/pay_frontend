@@ -219,19 +219,21 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
 
   return (
     <>
-      {/* 聊天悬浮按钮 - 参考DeepSeek样式 */}
+      {/* 聊天悬浮按钮 - 右下角带文字 */}
       <div 
-        className="fixed bottom-6 right-6 z-50"
-        style={{ zIndex: 9999 }}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+        }}
       >
         <button
           onClick={openChat}
           className="relative group"
           style={{
-            width: '56px',
-            height: '56px',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '50%',
+            borderRadius: '28px',
             border: 'none',
             boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4)',
             cursor: 'pointer',
@@ -239,9 +241,15 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            gap: '8px',
+            padding: '14px 20px',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            fontFamily: 'inherit',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.transform = 'scale(1.05)';
             e.currentTarget.style.boxShadow = '0 12px 35px rgba(102, 126, 234, 0.6)';
           }}
           onMouseLeave={(e) => {
@@ -252,20 +260,24 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
         >
           {/* 聊天图标 */}
           <svg 
-            width="24" 
-            height="24" 
+            width="20" 
+            height="20" 
             viewBox="0 0 24 24" 
             fill="none" 
             stroke="white" 
             strokeWidth="2"
             strokeLinecap="round" 
             strokeLinejoin="round"
+            style={{ flexShrink: 0 }}
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             <circle cx="9" cy="10" r="1"/>
             <circle cx="15" cy="10" r="1"/>
             <path d="M9 14s1.5 2 3 2 3-2 3-2"/>
           </svg>
+          
+          {/* 按钮文字 */}
+          <span style={{ whiteSpace: 'nowrap' }}>联系我们</span>
           
           {/* 未读消息提示 */}
           {unreadCount > 0 && (

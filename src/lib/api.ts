@@ -43,12 +43,12 @@ async function request<T>(
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   
   const config: RequestInit = {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
-    ...options,
   };
 
   const fullUrl = `${getApiUrl()}${endpoint}`;
