@@ -131,19 +131,26 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
   // 处理SSE聊天消息
   const handleChatMessage = (data: any) => {
     console.log('ChatWidget收到聊天消息:', data);
+    console.log('当前用户手机号:', userPhone);
     
     try {
       const messageData = typeof data === 'string' ? JSON.parse(data) : data;
       console.log('解析后的消息数据:', messageData);
+      console.log('消息发送者:', messageData.sender, '消息接收者:', messageData.receiver);
       
       if (messageData.type === 'new_message') {
         // 添加新消息到列表
+        console.log('准备添加消息到列表');
         setMessages(prev => {
           // 避免重复添加
           const exists = prev.some(msg => msg.id === messageData.id);
-          if (exists) return prev;
+          console.log('检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          if (exists) {
+            console.log('消息已存在，跳过添加');
+            return prev;
+          }
           
-          return [...prev, {
+          const newMessage = {
             id: messageData.id,
             apiKey: messageData.apiKey,
             sender: messageData.sender,
@@ -153,12 +160,21 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
             isRead: false,
             createdAt: messageData.createdAt,
             updatedAt: messageData.createdAt
-          }];
+          };
+          
+          console.log('✅ 成功添加新消息到列表:', newMessage);
+          return [...prev, newMessage];
         });
 
         // 如果是接收到的消息（管理员发给用户的）
+        console.log('检查是否为管理员消息:');
+        console.log('- messageData.sender === "admin":', messageData.sender === 'admin');
+        console.log('- messageData.receiver === userPhone:', messageData.receiver === userPhone);
+        console.log('- messageData.receiver:', messageData.receiver);
+        console.log('- userPhone:', userPhone);
+        
         if (messageData.sender === 'admin' && messageData.receiver === userPhone) {
-          console.log('收到管理员消息，聊天窗口状态:', isOpen ? '打开' : '关闭');
+          console.log('✅ 确认收到管理员消息，聊天窗口状态:', isOpen ? '打开' : '关闭');
           if (isOpen) {
             // 聊天窗口打开时，直接标记为已读，不增加未读计数
             console.log('聊天窗口打开，将自动标记为已读');
