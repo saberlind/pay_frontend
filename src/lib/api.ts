@@ -241,3 +241,86 @@ export const notificationApi = {
     }
   },
 };
+
+// 聊天相关接口
+export interface ChatMessage {
+  id: number;
+  apiKey: string;
+  sender: string;
+  receiver: string;
+  content: string;
+  messageType: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessageRequest {
+  apiKey: string;
+  receiver: string;
+  content: string;
+}
+
+// 聊天相关API
+export const chatApi = {
+  // 发送消息
+  sendMessage: async (messageData: ChatMessageRequest, token: string): Promise<ApiResponse<ChatMessage>> => {
+    return request('/chat/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(messageData)
+    });
+  },
+
+  // 获取聊天记录
+  getChatHistory: async (apiKey: string, token: string): Promise<ApiResponse<ChatMessage[]>> => {
+    return request(`/chat/history?apiKey=${encodeURIComponent(apiKey)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  },
+
+  // 获取新消息
+  getNewMessages: async (apiKey: string, after: string, token: string): Promise<ApiResponse<ChatMessage[]>> => {
+    return request(`/chat/new-messages?apiKey=${encodeURIComponent(apiKey)}&after=${encodeURIComponent(after)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  },
+
+  // 标记消息为已读
+  markMessagesAsRead: async (apiKey: string, token: string): Promise<ApiResponse<void>> => {
+    return request(`/chat/mark-read?apiKey=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  },
+
+  // 获取未读消息数量
+  getUnreadMessageCount: async (apiKey: string, token: string): Promise<ApiResponse<number>> => {
+    return request(`/chat/unread-count?apiKey=${encodeURIComponent(apiKey)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  },
+
+  // 创建或获取会话
+  createOrGetSession: async (apiKey: string, token: string): Promise<ApiResponse<any>> => {
+    return request(`/chat/session?apiKey=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+};

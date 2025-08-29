@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // Dialog组件已替换为自定义实现
 import { tokenUtils, authApi, AuthResponse, notificationApi } from '@/lib/api';
+import ChatWidget from '@/components/ChatWidget';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -133,6 +134,16 @@ export default function HomePage() {
           // 解析失败时直接刷新用户信息
           refreshUserInfo();
         }
+        break;
+      case 'chat_message':
+        // 处理聊天消息
+        console.log("收到聊天消息:", event.data);
+        
+        // 触发自定义事件，让ChatWidget组件处理
+        const chatEvent = new CustomEvent('sse-chat-message', {
+          detail: event.data
+        });
+        window.dispatchEvent(chatEvent);
         break;
       default:
         if (event.data) {
@@ -781,6 +792,15 @@ export default function HomePage() {
         >
           {toastMessage}
         </div>
+      )}
+
+      {/* 聊天组件 */}
+      {user && (
+        <ChatWidget 
+          userPhone={user.phone}
+          token={tokenUtils.getToken() || ''}
+          apiKey={user.apiKey}
+        />
       )}
 
       {/* Toast 动画样式 */}

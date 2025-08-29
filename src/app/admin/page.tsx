@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 // UI组件已替换为内联样式实现
 import { adminApi, User, tokenUtils } from '@/lib/api';
-import { Search, Plus, LogOut, Smartphone, Users } from 'lucide-react';
+import AdminChatPanel from '@/components/AdminChatPanel';
+import { Search, Plus, LogOut, Smartphone, Users, MessageCircle } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function AdminPage() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState<'addPoints' | 'chat'>('addPoints');
 
   useEffect(() => {
     // 检查是否是管理员登录
@@ -178,7 +180,7 @@ export default function AdminPage() {
                   margin: 0,
                 }}
               >
-                用户点数管理
+                用户点数管理 & 客服聊天
               </p>
             </div>
           </div>
@@ -206,12 +208,72 @@ export default function AdminPage() {
       <div
         style={{
           padding: "1.5rem 1rem",
-          maxWidth: "400px",
+          maxWidth: activeTab === 'chat' ? "1200px" : "400px",
           margin: "0 auto",
         }}
       >
+        {/* 标签页导航 */}
+        <div
+          style={{
+            display: "flex",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            borderRadius: "1rem",
+            padding: "0.5rem",
+            marginBottom: "1.5rem",
+            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+          }}
+        >
+          <button
+            onClick={() => setActiveTab('addPoints')}
+            style={{
+              flex: 1,
+              padding: "0.75rem 1rem",
+              borderRadius: "0.75rem",
+              border: "none",
+              background: activeTab === 'addPoints' ? "#2563EB" : "transparent",
+              color: activeTab === 'addPoints' ? "white" : "#6B7280",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              transition: "all 0.2s",
+            }}
+          >
+            <Plus style={{ width: "16px", height: "16px" }} />
+            点数管理
+          </button>
+          <button
+            onClick={() => setActiveTab('chat')}
+            style={{
+              flex: 1,
+              padding: "0.75rem 1rem",
+              borderRadius: "0.75rem",
+              border: "none",
+              background: activeTab === 'chat' ? "#2563EB" : "transparent",
+              color: activeTab === 'chat' ? "white" : "#6B7280",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              transition: "all 0.2s",
+            }}
+          >
+            <MessageCircle style={{ width: "16px", height: "16px" }} />
+            客服聊天
+          </button>
+        </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        {/* 标签页内容 */}
+        {activeTab === 'addPoints' ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {/* 用户查询卡片 */}
           <div
             style={{
@@ -539,7 +601,13 @@ export default function AdminPage() {
               </button>
             </form>
           </div>
-        </div>
+          </div>
+        ) : (
+          /* 聊天标签页内容 */
+          <div>
+            <AdminChatPanel token={tokenUtils.getToken() || ''} />
+          </div>
+        )}
       </div>
     </div>
   );
