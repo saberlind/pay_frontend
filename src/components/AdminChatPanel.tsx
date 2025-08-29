@@ -59,10 +59,13 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
   const loadChatHistory = async (apiKey: string) => {
     try {
       setIsLoading(true);
+      console.log('AdminChatPanel加载聊天记录, apiKey:', apiKey, 'token:', token ? token.substring(0, 20) + "..." : "无token");
       const response = await chatApi.getChatHistory(apiKey, token);
       if (response.success) {
         setMessages(response.data || []);
         setTimeout(scrollToBottom, 100);
+      } else {
+        console.error('获取聊天记录失败:', response.message);
       }
     } catch (error) {
       console.error('加载聊天记录失败:', error);
@@ -103,7 +106,10 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
     loadChatHistory(session.apiKey);
     
     // 标记消息为已读
-    chatApi.markMessagesAsRead(session.apiKey, token).catch(console.error);
+    console.log('AdminChatPanel标记消息已读, apiKey:', session.apiKey, 'token:', token ? token.substring(0, 20) + "..." : "无token");
+    chatApi.markMessagesAsRead(session.apiKey, token).catch((error) => {
+      console.error('标记消息已读失败:', error);
+    });
     
     // 清除未读计数
     setUnreadCounts(prev => ({

@@ -91,6 +91,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     // 检查是否是管理员登录
+    const currentToken = tokenUtils.getToken();
+    console.log("管理员页面检查token:", currentToken ? currentToken.substring(0, 20) + "..." : "无token");
+    
     if (!tokenUtils.isAdminAuthenticated()) {
       console.log("不是管理员token，跳转到管理员登录页面");
       router.push('/admin/login');
