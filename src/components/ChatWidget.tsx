@@ -65,8 +65,34 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
       }, token);
 
       if (response.success) {
+        // 立即添加消息到本地状态，提供即时反馈
+        const newMsg: ChatMessage = {
+          id: response.data?.id || Date.now(), // 如果后端返回了id就用后端的，否则用临时id
+          apiKey,
+          sender: userPhone,
+          receiver: 'admin',
+          content: newMessage.trim(),
+          messageType: 'text',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        setMessages(prev => {
+          // 避免重复添加（检查内容和时间）
+          const exists = prev.some(msg => 
+            msg.content === newMsg.content && 
+            msg.sender === newMsg.sender && 
+            Math.abs(new Date(msg.createdAt).getTime() - new Date(newMsg.createdAt).getTime()) < 1000
+          );
+          if (exists) return prev;
+          return [...prev, newMsg];
+        });
+        
         setNewMessage('');
-        // 消息会通过SSE推送，这里不需要手动添加
+        
+        // 滚动到底部
+        setTimeout(scrollToBottom, 100);
       } else {
         alert('发送消息失败: ' + response.message);
       }
@@ -102,10 +128,11 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
 
   // 处理SSE聊天消息
   const handleChatMessage = (data: any) => {
-    console.log('收到聊天消息:', data);
+    console.log('ChatWidget收到聊天消息:', data);
     
     try {
       const messageData = typeof data === 'string' ? JSON.parse(data) : data;
+      console.log('解析后的消息数据:', messageData);
       
       if (messageData.type === 'new_message') {
         // 添加新消息到列表
@@ -127,8 +154,8 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
           }];
         });
 
-        // 如果是接收到的消息（不是自己发送的）
-        if (messageData.receiver === userPhone) {
+        // 如果是接收到的消息（管理员发给用户的）
+        if (messageData.sender === 'admin' && messageData.receiver === userPhone) {
           setUnreadCount(prev => prev + 1);
           
           // 如果聊天窗口是打开的，自动标记为已读
