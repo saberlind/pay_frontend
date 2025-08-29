@@ -7,7 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "export": "next build && next export",
-    "deploy": "npm run export"
+    "deploy": "npm run export",
+    "env:local": "node scripts/switch-env.js local",
+    "env:dev": "node scripts/switch-env.js dev",
+    "env:prod": "node scripts/switch-env.js prod",
+    "env:test": "node scripts/switch-env.js test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

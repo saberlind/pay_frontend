@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authApi } from "@/lib/api";
+import { getCompatibleApiUrl } from "@/config/api";
 
 interface ForgotPasswordForm {
   phone: string;
@@ -48,7 +49,7 @@ export default function ForgotPasswordPage() {
       }
 
       // 调用后端API验证手机号和API Key
-      const response = await fetch("http://129.211.92.125:1009/api/auth/verify-phone-apikey", {
+      const response = await fetch(`${getCompatibleApiUrl()}/auth/verify-phone-apikey`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +97,7 @@ export default function ForgotPasswordPage() {
 
     try {
       // 调用重置密码API
-      const response = await fetch('http://129.211.92.125:1009/api/auth/reset-password', {
+      const response = await fetch(`${getCompatibleApiUrl()}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

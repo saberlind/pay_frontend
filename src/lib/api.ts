@@ -1,12 +1,9 @@
 // API 配置和请求工具函数
-// 强制使用HTTP避免SSL错误
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://129.211.92.125:1009/api';
+import { getCompatibleApiUrl } from '@/config/api';
 
-// 在生产环境确保使用HTTP
+// 获取API基础URL
 const getApiUrl = () => {
-  const url = API_BASE_URL;
-  // 确保在Vercel部署时使用正确的协议
-  return url.replace('https://', 'http://');
+  return getCompatibleApiUrl();
 };
 
 interface ApiResponse<T> {
