@@ -107,8 +107,10 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
   // 标记消息为已读
   const markAsRead = async () => {
     try {
+      console.log('开始标记消息为已读, 当前未读数量:', unreadCount);
       await chatApi.markMessagesAsRead(apiKey, token);
       setUnreadCount(0);
+      console.log('消息已标记为已读，未读计数已清零');
     } catch (error) {
       console.error('标记消息为已读失败:', error);
     }
@@ -156,11 +158,19 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
 
         // 如果是接收到的消息（管理员发给用户的）
         if (messageData.sender === 'admin' && messageData.receiver === userPhone) {
-          setUnreadCount(prev => prev + 1);
-          
-          // 如果聊天窗口是打开的，自动标记为已读
+          console.log('收到管理员消息，聊天窗口状态:', isOpen ? '打开' : '关闭');
           if (isOpen) {
+            // 聊天窗口打开时，直接标记为已读，不增加未读计数
+            console.log('聊天窗口打开，将自动标记为已读');
             setTimeout(markAsRead, 500);
+          } else {
+            // 聊天窗口关闭时，增加未读计数
+            console.log('聊天窗口关闭，增加未读计数');
+            setUnreadCount(prev => {
+              const newCount = prev + 1;
+              console.log('未读计数更新:', prev, '=>', newCount);
+              return newCount;
+            });
           }
         }
 
