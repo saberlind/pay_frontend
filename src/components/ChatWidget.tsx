@@ -145,16 +145,20 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
     }
   };
 
-  // 打开聊天窗口
-  const openChat = () => {
-    setIsOpen(true);
-    if (unreadCount > 0) {
-      markAsRead();
+  // 切换聊天窗口状态
+  const toggleChat = () => {
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+      if (unreadCount > 0) {
+        markAsRead();
+      }
+      setTimeout(() => {
+        inputRef.current?.focus();
+        scrollToBottom();
+      }, 100);
     }
-    setTimeout(() => {
-      inputRef.current?.focus();
-      scrollToBottom();
-    }, 100);
   };
 
   // 关闭聊天窗口
@@ -229,7 +233,7 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
         }}
       >
         <button
-          onClick={openChat}
+          onClick={toggleChat}
           className="relative group"
           style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -256,28 +260,46 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
             e.currentTarget.style.transform = 'scale(1)';
             e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
           }}
-          title="联系客服"
+          title={isOpen ? "关闭聊天" : "联系客服"}
         >
-          {/* 聊天图标 */}
-          <svg 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="white" 
-            strokeWidth="2"
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-            style={{ flexShrink: 0 }}
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            <circle cx="9" cy="10" r="1"/>
-            <circle cx="15" cy="10" r="1"/>
-            <path d="M9 14s1.5 2 3 2 3-2 3-2"/>
-          </svg>
+          {/* 图标 - 根据状态切换 */}
+          {isOpen ? (
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="white" 
+              strokeWidth="2"
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{ flexShrink: 0 }}
+            >
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          ) : (
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="white" 
+              strokeWidth="2"
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{ flexShrink: 0 }}
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <circle cx="9" cy="10" r="1"/>
+              <circle cx="15" cy="10" r="1"/>
+              <path d="M9 14s1.5 2 3 2 3-2 3-2"/>
+            </svg>
+          )}
           
-          {/* 按钮文字 */}
-          <span style={{ whiteSpace: 'nowrap' }}>联系我们</span>
+          {/* 按钮文字 - 根据状态切换 */}
+          <span style={{ whiteSpace: 'nowrap' }}>
+            {isOpen ? '关闭聊天' : '联系我们'}
+          </span>
           
           {/* 未读消息提示 */}
           {unreadCount > 0 && (
