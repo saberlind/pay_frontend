@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 // UI组件已替换为内联样式实现
-import { adminApi, User, tokenUtils } from '@/lib/api';
+import { adminApi, User, tokenUtils, notificationApi } from '@/lib/api';
 import AdminChatPanel from '@/components/AdminChatPanel';
 import { Search, Plus, LogOut, Smartphone, Users, MessageCircle } from 'lucide-react';
 
@@ -19,6 +19,75 @@ export default function AdminPage() {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'addPoints' | 'chat'>('addPoints');
+  const [sseConnected, setSseConnected] = useState(false);
+  const sseRef = useRef<EventSource | null>(null);
+
+  // SSE连接管理
+  const connectSSE = () => {
+    console.log("管理员建立SSE连接...");
+    
+    // 关闭现有连接
+    if (sseRef.current) {
+      notificationApi.closeSSE(sseRef.current);
+      sseRef.current = null;
+      setSseConnected(false);
+    }
+
+    // 建立新连接 - 管理员使用 "admin" 作为标识符
+    const eventSource = notificationApi.connectSSE(
+      "admin",
+      (event: MessageEvent) => {
+        console.log("管理员收到SSE消息:", event);
+        handleSSEMessage(event);
+      },
+      (error: Event) => {
+        console.error("管理员SSE连接错误:", error);
+        setSseConnected(false);
+        // 5秒后重试连接
+        setTimeout(() => {
+          console.log("管理员尝试重新建立SSE连接...");
+          connectSSE();
+        }, 5000);
+      }
+    );
+
+    if (eventSource) {
+      sseRef.current = eventSource;
+      setSseConnected(true);
+      console.log("管理员SSE连接已建立");
+    }
+  };
+
+  // 处理SSE消息
+  const handleSSEMessage = (event: MessageEvent) => {
+    console.log('管理员页面收到SSE消息:', event);
+    
+    let messageData;
+    try {
+      messageData = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+    } catch (e) {
+      console.error('解析SSE消息失败:', e, event.data);
+      return;
+    }
+
+    console.log('管理员页面解析后的消息数据:', messageData);
+
+    switch (messageData.type) {
+      case 'chat_message':
+        // 处理聊天消息
+        console.log("管理员收到聊天消息:", messageData);
+        
+        // 触发自定义事件，让AdminChatPanel组件处理
+        const chatEvent = new CustomEvent('sse-chat-message', {
+          detail: messageData
+        });
+        window.dispatchEvent(chatEvent);
+        break;
+      default:
+        console.log('管理员收到未知类型消息:', messageData);
+        break;
+    }
+  };
 
   useEffect(() => {
     // 检查是否是管理员登录
@@ -28,6 +97,18 @@ export default function AdminPage() {
       return;
     }
     setIsAuthenticated(true);
+    
+    // 建立SSE连接
+    connectSSE();
+    
+    // 清理函数
+    return () => {
+      if (sseRef.current) {
+        console.log("管理员页面卸载，关闭SSE连接");
+        notificationApi.closeSSE(sseRef.current);
+        sseRef.current = null;
+      }
+    };
   }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,16 +244,28 @@ export default function AdminPage() {
               <Users style={{ width: "20px", height: "20px", color: "white" }} />
             </div>
             <div>
-              <h1
-                style={{
-                  fontSize: "1.125rem",
-                  fontWeight: "bold",
-                  color: "white",
-                  margin: 0,
-                }}
-              >
-                管理员面板
-              </h1>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <h1
+                  style={{
+                    fontSize: "1.125rem",
+                    fontWeight: "bold",
+                    color: "white",
+                    margin: 0,
+                  }}
+                >
+                  管理员面板
+                </h1>
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    backgroundColor: sseConnected ? "#10b981" : "#ef4444",
+                    transition: "background-color 0.3s",
+                  }}
+                  title={sseConnected ? "实时连接已建立" : "实时连接断开"}
+                ></div>
+              </div>
               <p
                 style={{
                   fontSize: "0.75rem",
