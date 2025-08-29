@@ -93,6 +93,13 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
         
         // 滚动到底部
         setTimeout(scrollToBottom, 100);
+        
+        // 临时解决方案：延迟刷新聊天历史以确保AI回复能被显示
+        console.log('发送消息成功，将在3秒后刷新聊天历史以获取AI回复');
+        setTimeout(() => {
+          console.log('开始刷新聊天历史...');
+          loadChatHistory();
+        }, 3000);
       } else {
         alert('发送消息失败: ' + response.message);
       }
