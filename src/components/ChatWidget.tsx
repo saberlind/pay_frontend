@@ -29,7 +29,7 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // 滚动到底部
   const scrollToBottom = () => {
@@ -219,95 +219,288 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
 
   return (
     <>
-      {/* 聊天悬浮按钮 */}
+      {/* 聊天悬浮按钮 - 参考DeepSeek样式 */}
       <div 
         className="fixed bottom-6 right-6 z-50"
         style={{ zIndex: 9999 }}
       >
         <button
           onClick={openChat}
-          className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110"
+          className="relative group"
+          style={{
+            width: '56px',
+            height: '56px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '50%',
+            border: 'none',
+            boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4)',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 12px 35px rgba(102, 126, 234, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
+          }}
           title="联系客服"
         >
-          {/* 客服图标 */}
+          {/* 聊天图标 */}
           <svg 
-            className="w-6 h-6" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
             fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+            stroke="white" 
+            strokeWidth="2"
+            strokeLinecap="round" 
+            strokeLinejoin="round"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" 
-            />
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <circle cx="9" cy="10" r="1"/>
+            <circle cx="15" cy="10" r="1"/>
+            <path d="M9 14s1.5 2 3 2 3-2 3-2"/>
           </svg>
           
           {/* 未读消息提示 */}
           {unreadCount > 0 && (
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+            <div 
+              style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                background: '#ff4757',
+                color: 'white',
+                fontSize: '12px',
+                fontWeight: '600',
+                borderRadius: '50%',
+                minWidth: '20px',
+                height: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                boxShadow: '0 2px 8px rgba(255, 71, 87, 0.4)',
+                animation: 'pulse 2s infinite',
+              }}
+            >
               {unreadCount > 99 ? '99+' : unreadCount}
             </div>
           )}
         </button>
       </div>
 
-      {/* 聊天窗口 */}
+      {/* 聊天窗口 - 参考DeepSeek样式 */}
       {isOpen && (
         <div 
-          className="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-2xl border z-50 flex flex-col"
-          style={{ zIndex: 9999 }}
+          style={{
+            position: 'fixed',
+            bottom: '90px',
+            right: '24px',
+            width: '400px',
+            height: '600px',
+            background: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            backdropFilter: 'blur(20px)',
+          }}
         >
           {/* 聊天窗口头部 */}
-          <div className="bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span className="font-medium">在线客服</span>
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              padding: '20px 24px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: '16px 16px 0 0',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div 
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#4ade80',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 8px rgba(74, 222, 128, 0.6)',
+                }}
+              />
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '2px' }}>
+                  在线客服
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.8 }}>
+                  我们将尽快回复您
+                </div>
+              </div>
             </div>
             <button
               onClick={closeChat}
-              className="text-white hover:text-gray-200 transition-colors"
+              style={{
+                background: 'rgba(255, 255, 255, 0.2)',
+                border: 'none',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+              }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
               </svg>
             </button>
           </div>
 
           {/* 聊天消息区域 */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+          <div 
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '24px',
+              background: '#fafbfc',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+          >
             {isLoading && messages.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                加载聊天记录...
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                height: '200px',
+                color: '#6b7280',
+              }}>
+                <div 
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    border: '3px solid #e5e7eb',
+                    borderTop: '3px solid #667eea',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    marginBottom: '12px',
+                  }}
+                />
+                <div style={{ fontSize: '14px' }}>加载聊天记录...</div>
               </div>
             ) : messages.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <p>暂无聊天记录</p>
-                <p className="text-sm mt-1">发送消息开始对话</p>
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                height: '200px',
+                color: '#6b7280',
+                textAlign: 'center',
+              }}>
+                <div 
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '16px',
+                  }}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '4px' }}>
+                  开始对话
+                </div>
+                <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                  发送消息开始与客服对话
+                </div>
               </div>
             ) : (
               messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.sender === userPhone ? 'justify-end' : 'justify-start'}`}
+                  style={{
+                    display: 'flex',
+                    flexDirection: message.sender === userPhone ? 'row-reverse' : 'row',
+                    alignItems: 'flex-end',
+                    gap: '8px',
+                  }}
                 >
-                  <div
-                    className={`max-w-[70%] p-3 rounded-lg ${
-                      message.sender === userPhone
-                        ? 'bg-blue-500 text-white rounded-br-sm'
-                        : 'bg-white text-gray-800 rounded-bl-sm border'
-                    }`}
+                  {/* 头像 */}
+                  <div 
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: message.sender === userPhone 
+                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                        : 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      flexShrink: 0,
+                    }}
                   >
-                    <div className="text-sm">{message.content}</div>
+                    {message.sender === userPhone ? '我' : '客服'}
+                  </div>
+                  
+                  {/* 消息内容 */}
+                  <div style={{ maxWidth: '70%' }}>
+                    <div
+                      style={{
+                        background: message.sender === userPhone 
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : '#ffffff',
+                        color: message.sender === userPhone ? 'white' : '#1f2937',
+                        padding: '12px 16px',
+                        borderRadius: message.sender === userPhone 
+                          ? '16px 16px 4px 16px'
+                          : '16px 16px 16px 4px',
+                        fontSize: '14px',
+                        lineHeight: '1.5',
+                        wordBreak: 'break-word',
+                        boxShadow: message.sender === userPhone 
+                          ? '0 4px 12px rgba(102, 126, 234, 0.3)'
+                          : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        border: message.sender === userPhone ? 'none' : '1px solid #e5e7eb',
+                      }}
+                    >
+                      {message.content}
+                    </div>
                     <div 
-                      className={`text-xs mt-1 ${
-                        message.sender === userPhone ? 'text-blue-100' : 'text-gray-500'
-                      }`}
+                      style={{
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        marginTop: '4px',
+                        textAlign: message.sender === userPhone ? 'right' : 'left',
+                      }}
                     >
                       {formatTime(message.createdAt)}
                     </div>
@@ -319,28 +512,87 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
           </div>
 
           {/* 消息输入区域 */}
-          <div className="p-4 border-t bg-white rounded-b-lg">
-            <div className="flex space-x-2">
-              <input
+          <div 
+            style={{
+              padding: '20px 24px',
+              background: '#ffffff',
+              borderTop: '1px solid #e5e7eb',
+              borderRadius: '0 0 16px 16px',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+              <textarea
                 ref={inputRef}
-                type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="输入消息..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isLoading}
+                style={{
+                  flex: 1,
+                  minHeight: '40px',
+                  maxHeight: '120px',
+                  padding: '12px 16px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  resize: 'none',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  fontFamily: 'inherit',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#667eea';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               <button
                 onClick={sendMessage}
                 disabled={isLoading || !newMessage.trim()}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  background: isLoading || !newMessage.trim() 
+                    ? '#e5e7eb' 
+                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: isLoading || !newMessage.trim() ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoading && newMessage.trim()) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
               >
                 {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div 
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      borderTop: '2px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }}
+                  />
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                   </svg>
                 )}
               </button>
@@ -348,6 +600,19 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
           </div>
         </div>
       )}
+
+      {/* 添加CSS动画 */}
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.1); opacity: 0.8; }
+        }
+      `}</style>
     </>
   );
 }

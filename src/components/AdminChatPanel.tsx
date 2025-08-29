@@ -25,7 +25,7 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<{[key: string]: number}>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // 滚动到底部
   const scrollToBottom = () => {
@@ -37,7 +37,19 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
     try {
       // 这里需要添加获取会话列表的API
       console.log('加载会话列表...');
-      // 暂时使用空数组，实际应该调用API
+      // 暂时使用模拟数据
+      const mockSessions: ChatSession[] = [
+        {
+          id: 1,
+          apiKey: '23f12298-7b37-43c4-b992-0b57177adc26',
+          userPhone: '17350059820',
+          status: 'active',
+          lastMessageAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      ];
+      setSessions(mockSessions);
     } catch (error) {
       console.error('加载会话列表失败:', error);
     }
@@ -196,49 +208,169 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
   }, [selectedSession]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border h-96 flex">
+    <div 
+      style={{
+        background: '#ffffff',
+        borderRadius: '16px',
+        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e5e7eb',
+        height: '600px',
+        display: 'flex',
+        overflow: 'hidden',
+      }}
+    >
       {/* 会话列表 */}
-      <div className="w-1/3 border-r flex flex-col">
-        <div className="p-4 border-b bg-gray-50">
-          <h3 className="font-medium text-gray-900">客服会话</h3>
-          <p className="text-sm text-gray-500">管理用户咨询</p>
+      <div 
+        style={{
+          width: '320px',
+          borderRight: '1px solid #e5e7eb',
+          display: 'flex',
+          flexDirection: 'column',
+          background: '#fafbfc',
+        }}
+      >
+        {/* 会话列表头部 */}
+        <div 
+          style={{
+            padding: '24px',
+            borderBottom: '1px solid #e5e7eb',
+            background: '#ffffff',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div 
+              style={{
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M17 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2v4l-4-4H9a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h8z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                客服会话
+              </h3>
+              <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+                管理用户咨询
+              </p>
+            </div>
+          </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto">
+        {/* 会话列表内容 */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
           {sessions.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z" />
-              </svg>
-              <p>暂无会话</p>
-              <p className="text-xs mt-1">等待用户发起咨询</p>
+            <div 
+              style={{
+                padding: '40px 24px',
+                textAlign: 'center',
+                color: '#6b7280',
+              }}
+            >
+              <div 
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px',
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
+                  <path d="M17 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2v4l-4-4H9a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h8z"/>
+                </svg>
+              </div>
+              <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '4px' }}>暂无会话</p>
+              <p style={{ fontSize: '14px', opacity: 0.7 }}>等待用户发起咨询</p>
             </div>
           ) : (
             sessions.map((session) => (
               <div
                 key={session.id}
                 onClick={() => selectSession(session)}
-                className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                  selectedSession?.id === session.id ? 'bg-blue-50 border-blue-200' : ''
-                }`}
+                style={{
+                  padding: '16px 24px',
+                  borderBottom: '1px solid #f3f4f6',
+                  cursor: 'pointer',
+                  background: selectedSession?.id === session.id ? '#f0f4ff' : 'transparent',
+                  transition: 'all 0.2s',
+                  borderLeft: selectedSession?.id === session.id ? '3px solid #667eea' : '3px solid transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedSession?.id !== session.id) {
+                    e.currentTarget.style.background = '#f9fafb';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedSession?.id !== session.id) {
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-gray-900">{session.userPhone}</span>
-                      {unreadCounts[session.apiKey] > 0 && (
-                        <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
-                          {unreadCounts[session.apiKey]}
-                        </span>
-                      )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <div 
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                        }}
+                      >
+                        {session.userPhone.slice(-2)}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
+                          {session.userPhone}
+                        </div>
+                        {unreadCounts[session.apiKey] > 0 && (
+                          <div 
+                            style={{
+                              background: '#ff4757',
+                              color: 'white',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              borderRadius: '10px',
+                              padding: '2px 6px',
+                              display: 'inline-block',
+                              marginTop: '2px',
+                            }}
+                          >
+                            {unreadCounts[session.apiKey]} 条新消息
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
                       {formatTime(session.lastMessageAt)}
                     </p>
                   </div>
-                  <div className={`w-2 h-2 rounded-full ${
-                    session.status === 'active' ? 'bg-green-400' : 'bg-gray-300'
-                  }`}></div>
+                  <div 
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: session.status === 'active' ? '#4ade80' : '#e5e7eb',
+                      marginTop: '12px',
+                    }}
+                  />
                 </div>
               </div>
             ))
@@ -247,55 +379,174 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
       </div>
 
       {/* 聊天区域 */}
-      <div className="flex-1 flex flex-col">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {selectedSession ? (
           <>
             {/* 聊天头部 */}
-            <div className="p-4 border-b bg-gray-50">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            <div 
+              style={{
+                padding: '24px',
+                borderBottom: '1px solid #e5e7eb',
+                background: '#ffffff',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div 
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
                   {selectedSession.userPhone.slice(-2)}
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">{selectedSession.userPhone}</h4>
-                  <p className="text-sm text-gray-500">会话ID: {selectedSession.apiKey.slice(-8)}</p>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                    {selectedSession.userPhone}
+                  </h4>
+                  <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+                    会话ID: {selectedSession.apiKey.slice(-8)}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* 消息区域 */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+            <div 
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '24px',
+                background: '#fafbfc',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
               {isLoading && messages.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                  加载聊天记录...
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  height: '200px',
+                  color: '#6b7280',
+                }}>
+                  <div 
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      border: '3px solid #e5e7eb',
+                      borderTop: '3px solid #667eea',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                      marginBottom: '12px',
+                    }}
+                  />
+                  <div style={{ fontSize: '14px' }}>加载聊天记录...</div>
                 </div>
               ) : messages.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  <p>暂无聊天记录</p>
-                  <p className="text-sm mt-1">开始与用户对话</p>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  height: '200px',
+                  color: '#6b7280',
+                  textAlign: 'center',
+                }}>
+                  <div 
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '4px' }}>
+                    暂无聊天记录
+                  </div>
+                  <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                    开始与用户对话
+                  </div>
                 </div>
               ) : (
                 messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${message.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: message.sender === 'admin' ? 'row-reverse' : 'row',
+                      alignItems: 'flex-end',
+                      gap: '8px',
+                    }}
                   >
-                    <div
-                      className={`max-w-[70%] p-3 rounded-lg ${
-                        message.sender === 'admin'
-                          ? 'bg-blue-500 text-white rounded-br-sm'
-                          : 'bg-white text-gray-800 rounded-bl-sm border'
-                      }`}
+                    {/* 头像 */}
+                    <div 
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: message.sender === 'admin' 
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        flexShrink: 0,
+                      }}
                     >
-                      <div className="text-sm">{message.content}</div>
+                      {message.sender === 'admin' ? '客服' : '用户'}
+                    </div>
+                    
+                    {/* 消息内容 */}
+                    <div style={{ maxWidth: '70%' }}>
+                      <div
+                        style={{
+                          background: message.sender === 'admin' 
+                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                            : '#ffffff',
+                          color: message.sender === 'admin' ? 'white' : '#1f2937',
+                          padding: '12px 16px',
+                          borderRadius: message.sender === 'admin' 
+                            ? '16px 16px 4px 16px'
+                            : '16px 16px 16px 4px',
+                          fontSize: '14px',
+                          lineHeight: '1.5',
+                          wordBreak: 'break-word',
+                          boxShadow: message.sender === 'admin' 
+                            ? '0 4px 12px rgba(102, 126, 234, 0.3)'
+                            : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                          border: message.sender === 'admin' ? 'none' : '1px solid #e5e7eb',
+                        }}
+                      >
+                        {message.content}
+                      </div>
                       <div 
-                        className={`text-xs mt-1 ${
-                          message.sender === 'admin' ? 'text-blue-100' : 'text-gray-500'
-                        }`}
+                        style={{
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          marginTop: '4px',
+                          textAlign: message.sender === 'admin' ? 'right' : 'left',
+                        }}
                       >
                         {formatTime(message.createdAt)}
                       </div>
@@ -307,28 +558,86 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
             </div>
 
             {/* 消息输入区域 */}
-            <div className="p-4 border-t bg-white">
-              <div className="flex space-x-2">
-                <input
+            <div 
+              style={{
+                padding: '20px 24px',
+                background: '#ffffff',
+                borderTop: '1px solid #e5e7eb',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                <textarea
                   ref={inputRef}
-                  type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="输入回复消息..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
+                  style={{
+                    flex: 1,
+                    minHeight: '40px',
+                    maxHeight: '120px',
+                    padding: '12px 16px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    lineHeight: '1.5',
+                    resize: 'none',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    fontFamily: 'inherit',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={isLoading || !newMessage.trim()}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: isLoading || !newMessage.trim() 
+                      ? '#e5e7eb' 
+                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: isLoading || !newMessage.trim() ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s',
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading && newMessage.trim()) {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
                   {isLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div 
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid rgba(255, 255, 255, 0.3)',
+                        borderTop: '2px solid white',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                      }}
+                    />
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                     </svg>
                   )}
                 </button>
@@ -336,17 +645,44 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            <div className="text-center">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <p className="text-lg font-medium">选择一个会话</p>
-              <p className="text-sm mt-1">从左侧选择用户开始聊天</p>
+          <div style={{ 
+            flex: 1, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: '#fafbfc',
+          }}>
+            <div style={{ textAlign: 'center', color: '#6b7280' }}>
+              <div 
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 20px',
+                }}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <p style={{ fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>选择一个会话</p>
+              <p style={{ fontSize: '14px', opacity: 0.7 }}>从左侧选择用户开始聊天</p>
             </div>
           </div>
         )}
       </div>
+
+      {/* CSS动画 */}
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
