@@ -137,11 +137,22 @@ export default function HomePage() {
         break;
       case 'chat_message':
         // 处理聊天消息
-        console.log("收到聊天消息:", event.data);
+        console.log("主页面收到聊天消息SSE事件:", event.data);
+        console.log("聊天消息数据类型:", typeof event.data);
+        
+        // 确保数据被正确解析
+        let chatMessageData;
+        try {
+          chatMessageData = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+          console.log("主页面解析聊天消息成功:", chatMessageData);
+        } catch (e) {
+          console.error("主页面解析聊天消息失败:", e, event.data);
+          break;
+        }
         
         // 触发自定义事件，让ChatWidget组件处理
         const chatEvent = new CustomEvent('sse-chat-message', {
-          detail: event.data
+          detail: chatMessageData // 传递解析后的数据对象，而不是原始字符串
         });
         window.dispatchEvent(chatEvent);
         break;

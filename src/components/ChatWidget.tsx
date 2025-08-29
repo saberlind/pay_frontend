@@ -138,12 +138,14 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
   // 处理SSE聊天消息
   const handleChatMessage = (data: any) => {
     console.log('ChatWidget收到聊天消息:', data);
+    console.log('ChatWidget消息数据类型:', typeof data);
     console.log('当前用户手机号:', userPhone);
     
     try {
-      const messageData = typeof data === 'string' ? JSON.parse(data) : data;
-      console.log('解析后的消息数据:', messageData);
-      console.log('消息发送者:', messageData.sender, '消息接收者:', messageData.receiver);
+      // 数据应该已经在主页面被解析过，这里直接使用
+      const messageData = data;
+      console.log('ChatWidget处理消息数据:', messageData);
+      console.log('消息发送者:', messageData.sender, '消息接收者:', messageData.receiver, '消息类型:', messageData.type);
       
       if (messageData.type === 'new_message') {
         // 添加新消息到列表
