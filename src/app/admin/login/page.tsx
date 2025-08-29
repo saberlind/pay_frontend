@@ -59,13 +59,13 @@ export default function AdminLoginPage() {
         padding: "1rem",
       }}
     >
-      <div style={{ width: "100%", maxWidth: "400px" }}>
+      <div style={{ width: "100%", maxWidth: "380px" }}>
         <div
           style={{
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(10px)",
             borderRadius: "1rem",
-            padding: "2rem",
+            padding: "1.75rem",
             boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
             border: "1px solid rgba(255, 255, 255, 0.18)",
           }}
@@ -175,12 +175,12 @@ export default function AdminLoginPage() {
                   required
                   style={{
                     paddingLeft: "44px",
-                    paddingRight: "44px",
-                    height: "42px",
+                    paddingRight: "12px",
+                    height: "48px",
                     width: "100%",
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
-                    fontSize: "15px",
+                    fontSize: "14px",
                     outline: "none",
                     transition: "border-color 0.2s",
                     boxSizing: "border-box",
@@ -229,11 +229,11 @@ export default function AdminLoginPage() {
                   style={{
                     paddingLeft: "44px",
                     paddingRight: "44px",
-                    height: "42px",
+                    height: "48px",
                     width: "100%",
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
-                    fontSize: "15px",
+                    fontSize: "14px",
                     outline: "none",
                     transition: "border-color 0.2s",
                     boxSizing: "border-box",
