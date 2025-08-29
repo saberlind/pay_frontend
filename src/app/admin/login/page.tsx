@@ -175,7 +175,7 @@ export default function AdminLoginPage() {
                   required
                   style={{
                     paddingLeft: "44px",
-                    paddingRight: "12px",
+                    paddingRight: "44px",
                     height: "42px",
                     width: "100%",
                     border: "1px solid #D1D5DB",
