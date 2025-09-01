@@ -87,8 +87,33 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
       }, token);
 
       if (response.success) {
+        // 立即添加消息到本地状态，提供即时反馈（和用户界面一致）
+        const newMsg = {
+          id: response.data?.id || Date.now(),
+          apiKey: selectedSession.apiKey,
+          sender: 'admin',
+          receiver: selectedSession.userPhone,
+          content: newMessage.trim(),
+          messageType: 'text',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        setMessages(prev => {
+          // 避免重复添加（如果SSE也推送了相同消息）
+          const exists = prev.some(msg => msg.id === newMsg.id);
+          if (!exists) {
+            const updated = [...prev, newMsg];
+            // 自动滚动到底部
+            setTimeout(() => scrollToBottom(), 100);
+            return updated;
+          }
+          return prev;
+        });
+        
         setNewMessage('');
-        // 消息会通过SSE推送，这里不需要手动添加
+        console.log("✅ 管理员消息已立即显示:", newMsg);
       } else {
         alert('发送消息失败: ' + response.message);
       }
