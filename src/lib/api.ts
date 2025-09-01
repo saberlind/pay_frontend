@@ -143,6 +143,14 @@ export const tokenUtils = {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('user_token');
       console.log("从localStorage获取用户token:", token ? token.substring(0, 20) + "..." : "无");
+      
+      // 检查token是否过期
+      if (token && tokenUtils.isTokenExpired(token)) {
+        console.log("用户token已过期，自动清理");
+        localStorage.removeItem('user_token');
+        return null;
+      }
+      
       return token;
     }
     return null;
@@ -174,6 +182,14 @@ export const tokenUtils = {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('admin_token');
       console.log("从localStorage获取管理员token:", token ? token.substring(0, 20) + "..." : "无");
+      
+      // 检查token是否过期
+      if (token && tokenUtils.isTokenExpired(token)) {
+        console.log("管理员token已过期，自动清理");
+        localStorage.removeItem('admin_token');
+        return null;
+      }
+      
       return token;
     }
     return null;
@@ -183,6 +199,27 @@ export const tokenUtils = {
     if (typeof window !== 'undefined') {
       console.log("从localStorage移除管理员token");
       localStorage.removeItem('admin_token');
+    }
+  },
+
+  // 检查token是否过期
+  isTokenExpired: (token: string): boolean => {
+    try {
+      // 解析JWT token的payload部分
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000); // 当前时间戳（秒）
+      const expirationTime = payload.exp; // token过期时间戳（秒）
+      
+      console.log("Token过期检查:", {
+        current: new Date(currentTime * 1000).toLocaleString(),
+        expiry: new Date(expirationTime * 1000).toLocaleString(),
+        expired: currentTime >= expirationTime
+      });
+      
+      return currentTime >= expirationTime;
+    } catch (error) {
+      console.log("解析token失败，视为过期:", error);
+      return true; // 解析失败就认为过期
     }
   },
 
