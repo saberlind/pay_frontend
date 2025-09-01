@@ -40,7 +40,8 @@ async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // 使用正确的tokenUtils获取用户token
+  const token = tokenUtils.getToken();
   
   const config: RequestInit = {
     ...options,
@@ -50,6 +51,27 @@ async function request<T>(
       ...options.headers,
     },
   };
+
+  // 调试token发送
+  if (token) {
+    console.log("🔐 即将发送的token:", token.substring(0, 30) + "...");
+    
+    // 验证token格式和内容
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log("🔍 Token payload详情:", {
+        subject: payload.sub,
+        issued_at: new Date(payload.iat * 1000).toLocaleString(),
+        expires_at: new Date(payload.exp * 1000).toLocaleString(),
+        current_time: new Date().toLocaleString(),
+        is_expired_clientside: new Date() >= new Date(payload.exp * 1000)
+      });
+    } catch (e) {
+      console.error("❌ Token格式解析失败:", e);
+    }
+  } else {
+    console.log("⚠️ 没有token被发送");
+  }
 
   const fullUrl = `${getApiUrl()}${endpoint}`;
   console.log("发起API请求:", fullUrl, "配置:", config);
