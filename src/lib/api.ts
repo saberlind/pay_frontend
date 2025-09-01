@@ -304,6 +304,12 @@ export const notificationApi = {
       onMessage(event);
     });
     
+    // 监听聊天消息事件
+    eventSource.addEventListener('chat_message', (event) => {
+      console.log('🔔 收到SSE聊天消息事件:', event.data);
+      onMessage(event);
+    });
+    
     // 错误处理
     eventSource.onerror = (error) => {
       console.error('SSE连接发生错误:', error);
