@@ -128,20 +128,21 @@ export const adminApi = {
   },
 };
 
-// Token 管理
+// Token 管理 - 分离用户和管理员token
 export const tokenUtils = {
+  // 用户token管理
   setToken: (token: string) => {
     if (typeof window !== 'undefined') {
-      console.log("保存token到localStorage:", token.substring(0, 20) + "...");
-      localStorage.setItem('token', token);
-      console.log("token保存完成，验证:", localStorage.getItem('token') ? "成功" : "失败");
+      console.log("保存用户token到localStorage:", token.substring(0, 20) + "...");
+      localStorage.setItem('user_token', token);
+      console.log("用户token保存完成，验证:", localStorage.getItem('user_token') ? "成功" : "失败");
     }
   },
 
   getToken: (): string | null => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      console.log("从localStorage获取token:", token ? token.substring(0, 20) + "..." : "无");
+      const token = localStorage.getItem('user_token');
+      console.log("从localStorage获取用户token:", token ? token.substring(0, 20) + "..." : "无");
       return token;
     }
     return null;
@@ -149,20 +150,45 @@ export const tokenUtils = {
 
   removeToken: () => {
     if (typeof window !== 'undefined') {
-      console.log("从localStorage移除token");
-      localStorage.removeItem('token');
+      console.log("从localStorage移除用户token");
+      localStorage.removeItem('user_token');
     }
   },
 
   isAuthenticated: (): boolean => {
     const hasToken = !!tokenUtils.getToken();
-    console.log("检查认证状态:", hasToken);
+    console.log("检查用户认证状态:", hasToken);
     return hasToken;
+  },
+
+  // 管理员token管理
+  setAdminToken: (token: string) => {
+    if (typeof window !== 'undefined') {
+      console.log("保存管理员token到localStorage:", token.substring(0, 20) + "...");
+      localStorage.setItem('admin_token', token);
+      console.log("管理员token保存完成，验证:", localStorage.getItem('admin_token') ? "成功" : "失败");
+    }
+  },
+
+  getAdminToken: (): string | null => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('admin_token');
+      console.log("从localStorage获取管理员token:", token ? token.substring(0, 20) + "..." : "无");
+      return token;
+    }
+    return null;
+  },
+
+  removeAdminToken: () => {
+    if (typeof window !== 'undefined') {
+      console.log("从localStorage移除管理员token");
+      localStorage.removeItem('admin_token');
+    }
   },
 
   // 检查是否是管理员token
   isAdminAuthenticated: (): boolean => {
-    const token = tokenUtils.getToken();
+    const token = tokenUtils.getAdminToken();
     if (!token) return false;
     
     try {

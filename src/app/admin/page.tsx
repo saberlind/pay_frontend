@@ -102,7 +102,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     // 检查是否是管理员登录
-    const currentToken = tokenUtils.getToken();
+    const currentToken = tokenUtils.getAdminToken();
     console.log("管理员页面检查token:", currentToken ? currentToken.substring(0, 20) + "..." : "无token");
     
     if (!tokenUtils.isAdminAuthenticated()) {
@@ -712,7 +712,7 @@ export default function AdminPage() {
         ) : (
           /* 聊天标签页内容 */
           <div>
-            <AdminChatPanel token={tokenUtils.getToken() || ''} />
+            <AdminChatPanel token={tokenUtils.getAdminToken() || ''} />
           </div>
         )}
       </div>

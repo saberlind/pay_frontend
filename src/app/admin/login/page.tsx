@@ -25,8 +25,8 @@ export default function AdminLoginPage() {
       const response = await authApi.adminLogin(formData);
       
       if (response.success && response.data) {
-        // 保存 token
-        tokenUtils.setToken(response.data.token);
+        // 保存管理员token
+        tokenUtils.setAdminToken(response.data.token);
         
         // 跳转到管理页面
         router.push('/admin');
