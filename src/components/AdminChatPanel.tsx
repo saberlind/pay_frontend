@@ -163,10 +163,23 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
         // 添加新消息到列表
         setMessages(prev => {
           // 避免重复添加
+          console.log('🔍 AdminPanel检查消息重复 - 当前消息列表长度:', prev.length);
+          console.log('🔍 AdminPanel当前消息列表的最后3条消息ID:', prev.slice(-3).map(m => m.id));
+          console.log('🔍 AdminPanel准备添加的消息ID:', messageData.id);
+          console.log('🔍 AdminPanel当前选中会话:', selectedSession?.apiKey);
+          console.log('🔍 AdminPanel消息所属会话:', messageData.apiKey);
+          
           const exists = prev.some(msg => msg.id === messageData.id);
-          console.log('检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          console.log('🔍 AdminPanel检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          
           if (exists) {
-            console.log('消息已存在，跳过添加');
+            console.log('⚠️ AdminPanel消息已存在，跳过添加 - 消息内容:', messageData.content.substring(0, 20));
+            return prev;
+          }
+          
+          // 检查消息是否属于当前选中的会话
+          if (selectedSession && messageData.apiKey !== selectedSession.apiKey) {
+            console.log('⚠️ AdminPanel消息不属于当前会话，跳过添加 - 当前会话:', selectedSession.apiKey, '消息会话:', messageData.apiKey);
             return prev;
           }
           
@@ -182,12 +195,15 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
             updatedAt: messageData.createdAt
           };
           
-          console.log('✅ 管理员成功添加新消息到列表:', newMessage);
+          console.log('✅ AdminPanel成功添加新消息到列表:', newMessage);
+          console.log('✅ AdminPanel更新后消息列表长度将变为:', prev.length + 1);
+          
           const updatedMessages = [...prev, newMessage];
           
           // 自动滚动到底部
           setTimeout(() => {
             scrollToBottom();
+            console.log('🎯 AdminPanel消息列表已更新，当前长度:', updatedMessages.length);
           }, 100);
           
           return updatedMessages;

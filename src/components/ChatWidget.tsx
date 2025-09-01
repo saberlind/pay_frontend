@@ -152,10 +152,15 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
         console.log('准备添加消息到列表');
         setMessages(prev => {
           // 避免重复添加
+          console.log('🔍 检查消息重复 - 当前消息列表长度:', prev.length);
+          console.log('🔍 当前消息列表的最后3条消息ID:', prev.slice(-3).map(m => m.id));
+          console.log('🔍 准备添加的消息ID:', messageData.id);
+          
           const exists = prev.some(msg => msg.id === messageData.id);
-          console.log('检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          console.log('🔍 检查消息是否已存在:', exists, '消息ID:', messageData.id);
+          
           if (exists) {
-            console.log('消息已存在，跳过添加');
+            console.log('⚠️ 消息已存在，跳过添加 - 消息内容:', messageData.content.substring(0, 20));
             return prev;
           }
           
@@ -172,7 +177,16 @@ export default function ChatWidget({ userPhone, token, apiKey }: ChatWidgetProps
           };
           
           console.log('✅ 成功添加新消息到列表:', newMessage);
-          return [...prev, newMessage];
+          console.log('✅ 更新后消息列表长度将变为:', prev.length + 1);
+          
+          const updated = [...prev, newMessage];
+          
+          // 触发界面更新通知
+          setTimeout(() => {
+            console.log('🎯 消息列表已更新，当前长度:', updated.length);
+          }, 100);
+          
+          return updated;
         });
 
         // 如果是接收到的消息（管理员发给用户的）
