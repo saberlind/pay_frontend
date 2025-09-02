@@ -41,16 +41,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log(`🔍 请求头:`, req.headers.authorization ? '包含 Authorization' : '无 Authorization');
   
   try {
+    // 添加超时控制
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.log('⏰ 请求超时，终止连接');
+      controller.abort();
+    }, 25000); // 25秒超时，留5秒给Vercel处理
+    
     // 构建请求配置
     const requestConfig: RequestInit = {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'Vercel-Proxy/1.0',
         // 转发认证头
         ...(req.headers.authorization && { 
           'Authorization': req.headers.authorization 
         }),
       },
+      signal: controller.signal,
     };
     
     // 对于POST/PUT请求，转发请求体
@@ -59,7 +68,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     // 发起请求到后端
+    console.log(`🚀 发起请求到: ${fullUrl}`);
     const response = await fetch(fullUrl, requestConfig);
+    clearTimeout(timeoutId); // 清除超时计时器
+    
+    console.log(`📨 后端响应状态: ${response.status}`);
     const data = await response.text();
     
     // 设置CORS头
@@ -79,11 +92,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
   } catch (error) {
-    console.error('代理请求失败:', error);
-    res.status(500).json({ 
+    console.error('❌ 代理请求失败:', error);
+    
+    let errorMessage = '未知错误';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (error.name === 'AbortError') {
+        errorMessage = '请求超时 - 无法连接到后端服务器';
+        statusCode = 504; // Gateway Timeout
+      } else if (error.message.includes('fetch')) {
+        errorMessage = '网络连接失败 - 后端服务器不可达';
+        statusCode = 502; // Bad Gateway
+      }
+    }
+    
+    res.status(statusCode).json({ 
       success: false, 
       message: '代理服务器错误',
-      error: error instanceof Error ? error.message : '未知错误'
+      error: errorMessage,
+      targetUrl: fullUrl,
+      timestamp: new Date().toISOString()
     });
   }
 }
