@@ -10,8 +10,8 @@ export class ApiConfig {
   
   // 环境配置映射
   private static readonly ENV_CONFIGS = {
-    // 本地开发环境 - 直接访问 HTTP 后端
-    local: 'http://localhost:1009/api',
+    // 本地开发环境 - 使用代理方式调试
+    local: '/api/proxy',
     
     // 远程开发服务器 - 直接访问 HTTP 后端
     dev: 'http://129.211.92.125:1009/api',

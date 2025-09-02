@@ -12,6 +12,7 @@
     "env:dev": "node scripts/switch-env.js dev",
     "env:prod": "node scripts/switch-env.js prod",
     "env:test": "node scripts/switch-env.js test",
+    "debug:proxy": "node scripts/debug-proxy.js",
     "build:vercel": "DEPLOYMENT_TARGET=vercel npm run build",
     "build:github": "DEPLOYMENT_TARGET=github npm run build",
     "deploy:github": "npm run build:github && gh-pages -d out",
