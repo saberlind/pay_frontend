@@ -4,7 +4,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // 后端API基础地址
-const BACKEND_BASE_URL = process.env.BACKEND_API_URL || 'http://129.211.92.125:1009';
+const BACKEND_BASE_URL = process.env.BACKEND_API_URL || 'http://129.211.92.125:1009/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // 处理 OPTIONS 预检请求

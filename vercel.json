@@ -1,7 +1,7 @@
 {
   "env": {
     "DEPLOYMENT_TARGET": "vercel",
-    "BACKEND_API_URL": "http://129.211.92.125:1009"
+    "BACKEND_API_URL": "http://129.211.92.125:1009/api"
   },
   "functions": {
     "src/pages/api/proxy/[...path].ts": {

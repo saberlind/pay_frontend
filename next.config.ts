@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
   // 环境变量配置
   env: {
     DEPLOYMENT_TARGET: process.env.DEPLOYMENT_TARGET || 'vercel',
-    BACKEND_API_URL: process.env.BACKEND_API_URL || 'http://129.211.92.125:1009',
+    BACKEND_API_URL: process.env.BACKEND_API_URL || 'http://129.211.92.125:1009/api',
   },
 };
 
