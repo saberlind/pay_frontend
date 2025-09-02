@@ -85,7 +85,7 @@ export default function AdminPage() {
           console.log("管理员解析聊天消息成功:", chatMessageData);
         } catch (e) {
           console.error("管理员解析聊天消息失败:", e, messageData);
-          break;
+          return;
         }
         
         // 触发自定义事件，让AdminChatPanel组件处理

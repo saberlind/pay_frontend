@@ -147,7 +147,7 @@ export default function HomePage() {
           console.log("主页面解析聊天消息成功:", chatMessageData);
         } catch (e) {
           console.error("主页面解析聊天消息失败:", e, event.data);
-          break;
+          return;
         }
         
         // 触发自定义事件，让ChatWidget组件处理
