@@ -15,8 +15,8 @@ const path = require('path');
 const environments = {
   local: 'http://localhost:1009/api',
   dev: 'http://129.211.92.125:1009/api',
-  prod: 'https://your-backend.onrender.com/api',
-  test: 'http://test-server:1009/api'
+  prod: 'http://129.211.92.125:1009/api',
+  test: 'http://129.211.92.125:1009/api'
 };
 
 // 获取命令行参数

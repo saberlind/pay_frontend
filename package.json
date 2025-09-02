@@ -11,7 +11,13 @@
     "env:local": "node scripts/switch-env.js local",
     "env:dev": "node scripts/switch-env.js dev",
     "env:prod": "node scripts/switch-env.js prod",
-    "env:test": "node scripts/switch-env.js test"
+    "env:test": "node scripts/switch-env.js test",
+    "build:vercel": "DEPLOYMENT_TARGET=vercel npm run build",
+    "build:github": "DEPLOYMENT_TARGET=github npm run build",
+    "deploy:github": "npm run build:github && gh-pages -d out",
+    "deploy:vercel": "npm run build:vercel && vercel --prod",
+    "test:deployment": "node scripts/test-deployment.js",
+    "test:local": "node scripts/test-deployment.js http://localhost:3000"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
