@@ -75,8 +75,11 @@ async function request<T>(
 
   let fullUrl = `${getApiUrl()}${endpoint}`;
   
-  // 如果使用CORS代理，需要特殊处理URL
-  if (fullUrl.includes('/api/cors-proxy')) {
+  // 如果使用公共CORS代理，需要特殊处理URL
+  if (fullUrl.includes('allorigins.win')) {
+    const backendUrl = `http://129.211.92.125:1009/api${endpoint}`;
+    fullUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
+  } else if (fullUrl.includes('/api/cors-proxy')) {
     fullUrl = `/api/cors-proxy?url=${encodeURIComponent(endpoint)}`;
   }
   
