@@ -41,6 +41,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log(`🔍 请求头:`, req.headers.authorization ? '包含 Authorization' : '无 Authorization');
   
   try {
+    // 在Vercel环境中，使用公共CORS代理作为中转
+    const isVercelEnv = process.env.VERCEL || process.env.VERCEL_ENV;
+    let actualUrl = fullUrl;
+    
+    if (isVercelEnv) {
+      // 在Vercel中使用公共代理
+      actualUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fullUrl)}`;
+      console.log(`🌐 Vercel环境，使用CORS代理: ${actualUrl}`);
+    }
+    
     // 添加超时控制
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -68,8 +78,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     // 发起请求到后端
-    console.log(`🚀 发起请求到: ${fullUrl}`);
-    const response = await fetch(fullUrl, requestConfig);
+    console.log(`🚀 发起请求到: ${actualUrl}`);
+    console.log(`📋 原始目标: ${fullUrl}`);
+    const response = await fetch(actualUrl, requestConfig);
     clearTimeout(timeoutId); // 清除超时计时器
     
     console.log(`📨 后端响应状态: ${response.status}`);
