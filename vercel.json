@@ -5,9 +5,7 @@
   },
   "functions": {
     "src/pages/api/proxy/[...path].ts": {
-      "maxDuration": 30,
-      "memory": 1024,
-      "runtime": "nodejs18.x"
+      "maxDuration": 30
     }
   },
   "headers": [
