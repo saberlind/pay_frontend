@@ -18,9 +18,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { path } = req.query;
   
-  // 构建目标URL
-  const targetPath = Array.isArray(path) ? path.join('/') : path;
-  const targetUrl = `${BACKEND_BASE_URL}/${targetPath}`;
+  console.log(`📥 代理接收请求:`, {
+    method: req.method,
+    url: req.url,
+    path: path,
+    pathType: Array.isArray(path) ? 'array' : typeof path,
+    backendBaseUrl: BACKEND_BASE_URL
+  });
+  
+  // 构建目标URL - 确保没有双斜杠
+  const targetPath = Array.isArray(path) ? path.join('/') : (path || '');
+  const cleanBackendUrl = BACKEND_BASE_URL.replace(/\/+$/, ''); // 移除末尾斜杠
+  const cleanTargetPath = targetPath.replace(/^\/+/, ''); // 移除开头斜杠
+  const targetUrl = `${cleanBackendUrl}/${cleanTargetPath}`;
   
   // 处理查询参数（排除 path 参数）
   const { path: _, ...queryParams } = req.query;
