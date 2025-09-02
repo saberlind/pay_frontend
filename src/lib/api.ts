@@ -73,7 +73,13 @@ async function request<T>(
     console.log("⚠️ 没有token被发送");
   }
 
-  const fullUrl = `${getApiUrl()}${endpoint}`;
+  let fullUrl = `${getApiUrl()}${endpoint}`;
+  
+  // 如果使用CORS代理，需要特殊处理URL
+  if (fullUrl.includes('/api/cors-proxy')) {
+    fullUrl = `/api/cors-proxy?url=${encodeURIComponent(endpoint)}`;
+  }
+  
   console.log("发起API请求:", fullUrl, "配置:", config);
 
   const response = await fetch(fullUrl, config);

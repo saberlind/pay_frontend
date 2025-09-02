@@ -22,8 +22,8 @@ export class ApiConfig {
     // 生产环境 - 使用反向代理
     prod: '/api',
     
-    // Vercel/Netlify 部署 - 使用 API Routes 代理
-    vercel: '/api/proxy',
+    // Vercel/Netlify 部署 - 使用备用CORS代理
+    vercel: '/api/cors-proxy',
     
     // GitHub Pages 部署 - 需要外部代理服务
     github: 'https://your-cors-proxy.herokuapp.com/http://129.211.92.125:1009/api'
