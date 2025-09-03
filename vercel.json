@@ -4,7 +4,7 @@
     "BACKEND_API_URL": "http://129.211.92.125:1009/api"
   },
   "functions": {
-    "src/pages/api/proxy/[...path].ts": {
+    "src/app/api/proxy/[...path]/route.ts": {
       "maxDuration": 30
     }
   },

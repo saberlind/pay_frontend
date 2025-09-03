@@ -3,11 +3,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// 后端API基础地址
-const BACKEND_BASE_URL = process.env.BACKEND_API_URL || 'http://129.211.92.125:1009/api';
+// 后端API基础地址 - 确保包含/api路径
+const BACKEND_API_URL = process.env.BACKEND_API_URL || 'http://129.211.92.125:1009/api';
+const BACKEND_BASE_URL = BACKEND_API_URL.endsWith('/api') ? BACKEND_API_URL : `${BACKEND_API_URL}/api`;
 
 console.log('🔧 App Router代理初始化:', {
   BACKEND_API_URL_ENV: process.env.BACKEND_API_URL,
+  BACKEND_API_URL: BACKEND_API_URL,
   BACKEND_BASE_URL: BACKEND_BASE_URL,
   NODE_ENV: process.env.NODE_ENV,
   VERCEL: process.env.VERCEL,
