@@ -164,7 +164,7 @@ export default function LoginPage() {
 
           {/* 登录表单 */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '0 8px' }}>
               <Input
                 name="phone"
                 type="tel"
@@ -178,7 +178,9 @@ export default function LoginPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
 
@@ -196,13 +198,15 @@ export default function LoginPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
             </div>
 
             {/* 记住我和忘记密码 */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input
                   type="checkbox"

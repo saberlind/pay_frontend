@@ -206,7 +206,7 @@ export default function RegisterPage() {
 
           {/* 注册表单 */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '0 8px' }}>
               <Input
                 name="username"
                 type="text"
@@ -222,7 +222,9 @@ export default function RegisterPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
 
@@ -240,7 +242,9 @@ export default function RegisterPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
 
@@ -258,7 +262,9 @@ export default function RegisterPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
 
@@ -276,13 +282,15 @@ export default function RegisterPage() {
                   background: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
-                  padding: '0 16px'
+                  padding: '0 16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               />
             </div>
 
             {/* 用户协议 */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '0 8px' }}>
               <input
                 type="checkbox"
                 required
