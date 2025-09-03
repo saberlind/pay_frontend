@@ -1,0 +1,3 @@
+[33m004a913[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m 修复登录代理问题和付款码显示优化
+[33m57e9ed6[m feat: Add local proxy debugging support with toggle script
+[33m366237a[m fix: Use Vercel proxy with internal CORS relay to maintain logging capability
