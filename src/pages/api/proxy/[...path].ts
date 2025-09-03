@@ -41,17 +41,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log(`🔍 请求头:`, req.headers.authorization ? '包含 Authorization' : '无 Authorization');
   
   try {
-    // 检测环境并决定是否使用CORS代理
+    // 直接连接后端，不使用第三方CORS代理
     const isVercelEnv = process.env.VERCEL || process.env.VERCEL_ENV;
     const isLocalEnv = process.env.NODE_ENV === 'development';
     let actualUrl = fullUrl;
     
     if (isVercelEnv) {
-      // 在Vercel中使用公共代理
-      actualUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fullUrl)}`;
-      console.log(`🌐 Vercel环境，使用CORS代理: ${actualUrl}`);
+      // Vercel环境直接连接后端
+      console.log(`🌐 Vercel环境，直接连接后端: ${actualUrl}`);
     } else if (isLocalEnv) {
-      // 本地环境直接连接后端（用于调试代理逻辑）
+      // 本地环境直接连接后端
       console.log(`🏠 本地环境，直接连接后端: ${actualUrl}`);
     } else {
       // 其他环境也直接连接

@@ -614,8 +614,8 @@ export default function HomePage() {
               background: "white",
               borderRadius: "1rem",
               padding: "2rem",
-              maxWidth: "500px",
-              width: "90%",
+              maxWidth: "600px",
+              width: "95%",
               maxHeight: "80vh",
               overflowY: "auto",
               boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -666,7 +666,7 @@ export default function HomePage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
                 gap: "1.5rem",
                 marginBottom: "1.5rem",
               }}
@@ -693,8 +693,10 @@ export default function HomePage() {
                 >
                   <div
                     style={{
-                      width: "128px",
-                      height: "128px",
+                      width: "min(240px, 80vw)",
+                      height: "min(240px, 80vw)",
+                      maxWidth: "300px",
+                      maxHeight: "300px",
                       margin: "0 auto",
                       background: "white",
                       borderRadius: "0.5rem",
@@ -708,9 +710,15 @@ export default function HomePage() {
                     <Image
                       src="/payment/wechat-qr.png"
                       alt="微信收款码"
-                      width={120}
-                      height={120}
-                      style={{ objectFit: "contain" }}
+                      width={220}
+                      height={220}
+                      style={{ 
+                        objectFit: "contain",
+                        width: "90%",
+                        height: "90%",
+                        maxWidth: "220px",
+                        maxHeight: "220px"
+                      }}
                     />
                   </div>
                 </div>
@@ -738,8 +746,10 @@ export default function HomePage() {
                 >
                   <div
                     style={{
-                      width: "128px",
-                      height: "128px",
+                      width: "min(240px, 80vw)",
+                      height: "min(240px, 80vw)",
+                      maxWidth: "300px",
+                      maxHeight: "300px",
                       margin: "0 auto",
                       background: "white",
                       borderRadius: "0.5rem",
@@ -753,9 +763,15 @@ export default function HomePage() {
                     <Image
                       src="/payment/alipay-qr.png"
                       alt="支付宝收款码"
-                      width={120}
-                      height={120}
-                      style={{ objectFit: "contain" }}
+                      width={220}
+                      height={220}
+                      style={{ 
+                        objectFit: "contain",
+                        width: "90%",
+                        height: "90%",
+                        maxWidth: "220px",
+                        maxHeight: "220px"
+                      }}
                     />
                   </div>
                 </div>

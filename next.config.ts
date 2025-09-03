@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
   // 静态导出配置（仅限 GitHub Pages）
   // 在 Vercel 部署时应该注释掉以支持 API Routes
   output: process.env.DEPLOYMENT_TARGET === 'github' ? 'export' : undefined,
-  trailingSlash: true,
+  trailingSlash: process.env.DEPLOYMENT_TARGET === 'github',
   images: {
-    unoptimized: true
+    unoptimized: process.env.DEPLOYMENT_TARGET === 'github'
   },
   
   // GitHub Pages配置
