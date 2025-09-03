@@ -20,11 +20,14 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'addPoints' | 'chat'>('addPoints');
   const [sseConnected, setSseConnected] = useState(false);
+  const [usingPolling, setUsingPolling] = useState(false);
   const sseRef = useRef<EventSource | null>(null);
+  const chatPollingRef = useRef<NodeJS.Timeout | null>(null);
+  const sseRetryCount = useRef(0);
 
   // SSE连接管理
   const connectSSE = () => {
-    console.log("管理员建立SSE连接...");
+    console.log("管理员建立SSE连接，重试次数:", sseRetryCount.current);
     
     // 关闭现有连接
     if (sseRef.current) {
@@ -32,22 +35,39 @@ export default function AdminPage() {
       sseRef.current = null;
       setSseConnected(false);
     }
+    
+    // 停止轮询
+    if (chatPollingRef.current) {
+      notificationApi.stopPolling(chatPollingRef.current);
+      chatPollingRef.current = null;
+      setUsingPolling(false);
+    }
 
     // 建立新连接 - 管理员使用 "admin" 作为标识符
     const eventSource = notificationApi.connectSSE(
       "admin",
       (event: MessageEvent) => {
         console.log("管理员收到SSE消息:", event);
+        sseRetryCount.current = 0; // 重置重试计数
         handleSSEMessage(event);
       },
       (error: Event) => {
         console.error("管理员SSE连接错误:", error);
         setSseConnected(false);
-        // 5秒后重试连接
-        setTimeout(() => {
-          console.log("管理员尝试重新建立SSE连接...");
-          connectSSE();
-        }, 5000);
+        sseRetryCount.current++;
+        
+        // 如果重试次数超过3次，降级到轮询
+        if (sseRetryCount.current >= 3) {
+          console.warn("管理员SSE连接多次失败，降级到轮询模式");
+          startAdminPolling();
+        } else {
+          // 继续重试SSE连接
+          const retryDelay = Math.min(5000 * sseRetryCount.current, 30000);
+          setTimeout(() => {
+            console.log("管理员尝试重新建立SSE连接...");
+            connectSSE();
+          }, retryDelay);
+        }
       }
     );
 
@@ -55,7 +75,26 @@ export default function AdminPage() {
       sseRef.current = eventSource;
       setSseConnected(true);
       console.log("管理员SSE连接已建立");
+    } else {
+      console.warn("无法创建管理员SSE连接，直接使用轮询模式");
+      startAdminPolling();
     }
+  };
+  
+  // 启动管理员轮询模式
+  const startAdminPolling = () => {
+    console.log("启动管理员轮询模式");
+    setUsingPolling(true);
+    setSseConnected(false);
+    
+    // 启动聊天消息轮询（5秒间隔）
+    chatPollingRef.current = notificationApi.startChatPolling(
+      (event: any) => {
+        console.log("管理员收到聊天轮询消息:", event);
+        handleSSEMessage(event);
+      },
+      5000 // 5秒间隔
+    );
   };
 
   // 处理SSE消息

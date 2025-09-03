@@ -20,7 +20,8 @@ export default function HomePage() {
   const [pointsUpdated, setPointsUpdated] = useState(false);
   const [usingPolling, setUsingPolling] = useState(false);
   const sseRef = useRef<EventSource | null>(null);
-  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const chatPollingRef = useRef<NodeJS.Timeout | null>(null);
+  const pointsPollingRef = useRef<NodeJS.Timeout | null>(null);
   const sseRetryCount = useRef(0);
 
   useEffect(() => {
@@ -56,11 +57,15 @@ export default function HomePage() {
     }
     
     // 如果轮询正在运行，先停止
-    if (pollingRef.current) {
-      notificationApi.stopPolling(pollingRef.current);
-      pollingRef.current = null;
-      setUsingPolling(false);
+    if (chatPollingRef.current) {
+      notificationApi.stopPolling(chatPollingRef.current);
+      chatPollingRef.current = null;
     }
+    if (pointsPollingRef.current) {
+      notificationApi.stopPolling(pointsPollingRef.current);
+      pointsPollingRef.current = null;
+    }
+    setUsingPolling(false);
 
     // 建立新连接
     const eventSource = notificationApi.connectSSE(
@@ -107,13 +112,22 @@ export default function HomePage() {
     setUsingPolling(true);
     setSseConnected(false);
     
-    pollingRef.current = notificationApi.startPolling(
-      userPhone,
+    // 启动聊天消息轮询（5秒间隔）
+    chatPollingRef.current = notificationApi.startChatPolling(
       (event: any) => {
-        console.log("收到轮询消息:", event);
+        console.log("收到聊天轮询消息:", event);
         handleSSEMessage(event);
       },
-      10000 // 10秒间隔
+      5000 // 5秒间隔
+    );
+    
+    // 启动点数轮询（5秒间隔）
+    pointsPollingRef.current = notificationApi.startPointsPolling(
+      (event: any) => {
+        console.log("收到点数轮询消息:", event);
+        handleSSEMessage(event);
+      },
+      5000 // 5秒间隔
     );
   };
 
@@ -212,9 +226,13 @@ export default function HomePage() {
         notificationApi.closeSSE(sseRef.current);
         console.log("组件卸载，SSE连接已关闭");
       }
-      if (pollingRef.current) {
-        notificationApi.stopPolling(pollingRef.current);
-        console.log("组件卸载，轮询已停止");
+      if (chatPollingRef.current) {
+        notificationApi.stopPolling(chatPollingRef.current);
+        console.log("组件卸载，聊天轮询已停止");
+      }
+      if (pointsPollingRef.current) {
+        notificationApi.stopPolling(pointsPollingRef.current);
+        console.log("组件卸载，点数轮询已停止");
       }
     };
   }, []);

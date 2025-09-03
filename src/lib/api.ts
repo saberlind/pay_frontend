@@ -345,42 +345,95 @@ export const notificationApi = {
     }
   },
   
-  // 轮询备用方案
-  startPolling: (phone: string, onMessage: (data: any) => void, interval: number = 5000): NodeJS.Timeout => {
-    console.log('启动轮询通知，间隔:', interval + 'ms');
+  // 轮询聊天消息
+  startChatPolling: (onMessage: (data: any) => void, interval: number = 5000): NodeJS.Timeout => {
+    console.log('启动聊天消息轮询，间隔:', interval + 'ms');
     
-    const pollForNotifications = async () => {
+    const pollForChatMessages = async () => {
       try {
         const token = tokenUtils.getToken();
         if (!token) {
-          console.warn('轮询中断：未找到认证token');
+          console.warn('聊天轮询中断：未找到认证token');
           return;
         }
         
-        // 检查是否有新的通知或点数更新
-        const response = await request<User>('/user/info', {
+        // 调用聊天消息轮询接口
+        const response = await request<any>('/chat/poll/messages', {
           method: 'GET',
         });
         
-        if (response.success && response.data) {
+        if (response.success && (response as any).hasNewMessages) {
+          console.log('发现新的聊天消息:', (response as any).unreadCount);
           // 模拟SSE事件格式
           const mockEvent = {
             data: JSON.stringify({
-              type: 'points_update',
-              points: response.data.points
+              type: 'chat_message',
+              hasNewMessages: (response as any).hasNewMessages,
+              unreadCount: (response as any).unreadCount,
+              userType: (response as any).userType
             }),
-            type: 'points_update'
+            type: 'chat_message'
           };
           onMessage(mockEvent);
         }
       } catch (error) {
-        console.warn('轮询请求失败:', error);
+        console.warn('聊天轮询请求失败:', error);
       }
     };
     
     // 立即执行一次，然后开始定时轮询
-    pollForNotifications();
-    return setInterval(pollForNotifications, interval);
+    pollForChatMessages();
+    return setInterval(pollForChatMessages, interval);
+  },
+  
+  // 轮询用户点数
+  startPointsPolling: (onMessage: (data: any) => void, interval: number = 5000): NodeJS.Timeout => {
+    console.log('启动点数轮询，间隔:', interval + 'ms');
+    let lastPoints: number | null = null;
+    
+    const pollForPointsUpdate = async () => {
+      try {
+        const token = tokenUtils.getToken();
+        if (!token) {
+          console.warn('点数轮询中断：未找到认证token');
+          return;
+        }
+        
+        // 调用点数轮询接口
+        const response = await request<{points: number, timestamp: number, username: string}>('/auth/poll/points', {
+          method: 'GET',
+        });
+        
+        if (response.success && response.data) {
+          const currentPoints = response.data.points;
+          
+          // 如果点数发生变化，触发通知
+          if (lastPoints !== null && lastPoints !== currentPoints) {
+            console.log('点数发生变化:', lastPoints, '->', currentPoints);
+            // 模拟SSE事件格式
+            const mockEvent = {
+              data: JSON.stringify({
+                type: 'points_update',
+                points: currentPoints,
+                previousPoints: lastPoints,
+                username: response.data.username,
+                timestamp: response.data.timestamp
+              }),
+              type: 'points_update'
+            };
+            onMessage(mockEvent);
+          }
+          
+          lastPoints = currentPoints;
+        }
+      } catch (error) {
+        console.warn('点数轮询请求失败:', error);
+      }
+    };
+    
+    // 立即执行一次，然后开始定时轮询
+    pollForPointsUpdate();
+    return setInterval(pollForPointsUpdate, interval);
   },
   
   // 停止轮询
