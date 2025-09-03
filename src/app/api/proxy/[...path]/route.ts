@@ -6,6 +6,14 @@ import { NextRequest, NextResponse } from 'next/server';
 // 后端API基础地址
 const BACKEND_BASE_URL = process.env.BACKEND_API_URL || 'http://129.211.92.125:1009/api';
 
+console.log('🔧 App Router代理初始化:', {
+  BACKEND_API_URL_ENV: process.env.BACKEND_API_URL,
+  BACKEND_BASE_URL: BACKEND_BASE_URL,
+  NODE_ENV: process.env.NODE_ENV,
+  VERCEL: process.env.VERCEL,
+  VERCEL_ENV: process.env.VERCEL_ENV
+});
+
 // 处理所有HTTP方法
 export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const resolvedParams = await params;
@@ -59,6 +67,15 @@ async function handleRequest(
   const cleanBackendUrl = BACKEND_BASE_URL.replace(/\/+$/, '');
   const cleanTargetPath = targetPath.replace(/^\/+/, '');
   const targetUrl = `${cleanBackendUrl}/${cleanTargetPath}`;
+  
+  console.log(`🔧 URL构建调试:`, {
+    originalPath: path,
+    targetPath: targetPath,
+    cleanBackendUrl: cleanBackendUrl,
+    cleanTargetPath: cleanTargetPath,
+    finalTargetUrl: targetUrl,
+    BACKEND_BASE_URL: BACKEND_BASE_URL
+  });
   
   // 处理查询参数
   const searchParams = request.nextUrl.searchParams;
