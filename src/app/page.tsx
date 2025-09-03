@@ -18,7 +18,10 @@ export default function HomePage() {
   const [toastMessage, setToastMessage] = useState('');
   const [sseConnected, setSseConnected] = useState(false);
   const [pointsUpdated, setPointsUpdated] = useState(false);
+  const [usingPolling, setUsingPolling] = useState(false);
   const sseRef = useRef<EventSource | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const sseRetryCount = useRef(0);
 
   useEffect(() => {
     console.log("主页加载，检查认证状态...");
@@ -43,7 +46,7 @@ export default function HomePage() {
 
   // 建立SSE连接
   const connectSSE = (userPhone: string) => {
-    console.log("尝试建立SSE连接，用户手机号:", userPhone);
+    console.log("尝试建立SSE连接，用户手机号:", userPhone, "重试次数:", sseRetryCount.current);
     
     // 如果已有连接，先关闭
     if (sseRef.current) {
@@ -51,22 +54,39 @@ export default function HomePage() {
       sseRef.current = null;
       setSseConnected(false);
     }
+    
+    // 如果轮询正在运行，先停止
+    if (pollingRef.current) {
+      notificationApi.stopPolling(pollingRef.current);
+      pollingRef.current = null;
+      setUsingPolling(false);
+    }
 
     // 建立新连接
     const eventSource = notificationApi.connectSSE(
       userPhone,
       (event: MessageEvent) => {
         console.log("收到SSE消息:", event);
+        sseRetryCount.current = 0; // 重置重试计数
         handleSSEMessage(event);
       },
       (error: Event) => {
         console.error("SSE连接错误:", error);
         setSseConnected(false);
-        // 5秒后重试连接
-        setTimeout(() => {
-          console.log("尝试重新建立SSE连接...");
-          connectSSE(userPhone);
-        }, 5000);
+        sseRetryCount.current++;
+        
+        // 如果重试次数超过3次，降级到轮询
+        if (sseRetryCount.current >= 3) {
+          console.warn("SSE连接多次失败，降级到轮询模式");
+          startPollingMode(userPhone);
+        } else {
+          // 继续重试SSE连接
+          const retryDelay = Math.min(5000 * sseRetryCount.current, 30000); // 最长30秒
+          setTimeout(() => {
+            console.log("尝试重新建立SSE连接...");
+            connectSSE(userPhone);
+          }, retryDelay);
+        }
       }
     );
 
@@ -74,7 +94,27 @@ export default function HomePage() {
       sseRef.current = eventSource;
       setSseConnected(true);
       console.log("SSE连接已建立");
+    } else {
+      // 如果无法创建SSE连接，直接降级到轮询
+      console.warn("无法创建SSE连接，直接使用轮询模式");
+      startPollingMode(userPhone);
     }
+  };
+  
+  // 启动轮询模式
+  const startPollingMode = (userPhone: string) => {
+    console.log("启动轮询模式");
+    setUsingPolling(true);
+    setSseConnected(false);
+    
+    pollingRef.current = notificationApi.startPolling(
+      userPhone,
+      (event: any) => {
+        console.log("收到轮询消息:", event);
+        handleSSEMessage(event);
+      },
+      10000 // 10秒间隔
+    );
   };
 
   // 刷新用户信息
@@ -165,12 +205,16 @@ export default function HomePage() {
     }
   };
 
-  // 组件卸载时关闭SSE连接
+  // 组件卸载时关闭所有连接
   useEffect(() => {
     return () => {
       if (sseRef.current) {
         notificationApi.closeSSE(sseRef.current);
         console.log("组件卸载，SSE连接已关闭");
+      }
+      if (pollingRef.current) {
+        notificationApi.stopPolling(pollingRef.current);
+        console.log("组件卸载，轮询已停止");
       }
     };
   }, []);
@@ -297,6 +341,24 @@ export default function HomePage() {
             <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
               欢迎，{user?.username || '用户'}
             </span>
+            {/* 连接状态指示器 */}
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "0.5rem",
+              fontSize: "12px",
+              color: "rgba(255, 255, 255, 0.7)"
+            }}>
+              <div style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: sseConnected ? "#10b981" : usingPolling ? "#f59e0b" : "#ef4444"
+              }}></div>
+              <span>
+                {sseConnected ? "实时连接" : usingPolling ? "轮询模式" : "连接中..."}
+              </span>
+            </div>
             <Button
               variant="outline"
               onClick={handleLogout}

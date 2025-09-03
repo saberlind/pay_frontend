@@ -281,10 +281,25 @@ export const notificationApi = {
     console.log('建立SSE连接:', sseUrl);
     
     const eventSource = new EventSource(sseUrl);
+    let connectionTimeout: NodeJS.Timeout;
+    let hasConnected = false;
+    
+    // 设置连接超时检测
+    connectionTimeout = setTimeout(() => {
+      if (!hasConnected) {
+        console.warn('SSE连接超时，关闭连接');
+        eventSource.close();
+        if (onError) {
+          onError(new Event('timeout') as any);
+        }
+      }
+    }, 10000); // 10秒超时
     
     // 连接成功事件
     eventSource.onopen = (event) => {
       console.log('SSE连接已建立', event);
+      hasConnected = true;
+      clearTimeout(connectionTimeout);
     };
     
     // 接收消息
@@ -327,6 +342,52 @@ export const notificationApi = {
     if (eventSource) {
       eventSource.close();
       console.log('SSE连接已关闭');
+    }
+  },
+  
+  // 轮询备用方案
+  startPolling: (phone: string, onMessage: (data: any) => void, interval: number = 5000): NodeJS.Timeout => {
+    console.log('启动轮询通知，间隔:', interval + 'ms');
+    
+    const pollForNotifications = async () => {
+      try {
+        const token = tokenUtils.getToken();
+        if (!token) {
+          console.warn('轮询中断：未找到认证token');
+          return;
+        }
+        
+        // 检查是否有新的通知或点数更新
+        const response = await request<User>('/user/info', {
+          method: 'GET',
+        });
+        
+        if (response.success && response.data) {
+          // 模拟SSE事件格式
+          const mockEvent = {
+            data: JSON.stringify({
+              type: 'points_update',
+              points: response.data.points
+            }),
+            type: 'points_update'
+          };
+          onMessage(mockEvent);
+        }
+      } catch (error) {
+        console.warn('轮询请求失败:', error);
+      }
+    };
+    
+    // 立即执行一次，然后开始定时轮询
+    pollForNotifications();
+    return setInterval(pollForNotifications, interval);
+  },
+  
+  // 停止轮询
+  stopPolling: (intervalId: NodeJS.Timeout) => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      console.log('轮询已停止');
     }
   },
 };
