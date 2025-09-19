@@ -165,6 +165,96 @@ export const adminApi = {
   },
 };
 
+// 积分监控相关接口
+export interface UsageDataPoint {
+  date: string;
+  amount: number;
+  timestamp: number;
+}
+
+export interface UsageMonitorData {
+  dataPoints: UsageDataPoint[];
+  totalUsage: number;
+  apiKey: string;
+  startTime?: string;
+  endTime?: string;
+  deductionType?: number;
+  deductionSubtype?: number;
+}
+
+export interface UsageMonitorRequest {
+  apiKey: string;
+  deductionType?: number | null;
+  deductionSubtype?: number | null;
+  startTime?: string | null;
+  endTime?: string | null;
+}
+
+// 积分监控 API
+export const pointsApi = {
+  // 管理员查询用户积分使用监控
+  getUsageMonitor: async (data: UsageMonitorRequest): Promise<ApiResponse<UsageMonitorData>> => {
+    // 使用管理员token的特殊请求函数
+    const adminToken = tokenUtils.getAdminToken();
+    
+    if (!adminToken) {
+      throw new Error('管理员未登录，请先登录管理员账号');
+    }
+    
+    const config: RequestInit = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    const fullUrl = `${getApiUrl()}/points/usage/monitor`;
+    
+    console.log("发起积分监控API请求:", fullUrl, "配置:", config);
+
+    const response = await fetch(fullUrl, config);
+    console.log("积分监控API响应状态:", response.status, response.statusText);
+    
+    const result = await response.json();
+    console.log("积分监控API响应数据:", result);
+    
+    if (!response.ok) {
+      console.error("积分监控API请求失败:", response.status, response.statusText);
+      if (result && result.message) {
+        return {
+          success: false,
+          message: result.message,
+          data: undefined
+        };
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return result;
+  },
+
+  // 用户查询自己的积分使用监控
+  getMyUsageMonitor: async (params: {
+    apiKey: string;
+    deductionType?: string;
+    deductionSubtype?: string;
+    startTime?: string;
+    endTime?: string;
+  }): Promise<ApiResponse<UsageMonitorData>> => {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        queryParams.append(key, value);
+      }
+    });
+    
+    return request(`/points/usage/my-monitor?${queryParams.toString()}`);
+  },
+};
+
 // Token 管理 - 分离用户和管理员token
 export const tokenUtils = {
   // 用户token管理

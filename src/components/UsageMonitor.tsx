@@ -3,22 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, BarChart3, Filter } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-interface UsageDataPoint {
-  date: string;
-  amount: number;
-  timestamp: number;
-}
-
-interface UsageMonitorData {
-  dataPoints: UsageDataPoint[];
-  totalUsage: number;
-  apiKey: string;
-  startTime?: string;
-  endTime?: string;
-  deductionType?: number;
-  deductionSubtype?: number;
-}
+import { pointsApi, UsageDataPoint, UsageMonitorData, tokenUtils } from '@/lib/api';
 
 interface UsageMonitorProps {
   /** 是否为管理员模式 */
@@ -50,32 +35,30 @@ export default function UsageMonitor({ isAdmin = false, userApiKey, apiBaseUrl }
   
   // 扣减类型和子类型的选项
   const deductionTypes = [
-    { value: '1', label: 'API调用' },
-    { value: '2', label: '文件处理' },
-    { value: '3', label: '数据分析' },
-    { value: '4', label: '其他服务' }
+    { value: '1', label: 'Bilibili' },
+    { value: '2', label: '抖音爆款' },
+    { value: '3', label: '视频信息提取' },
+    { value: '4', label: '实时热搜' }
   ];
   
   const deductionSubtypes = {
     '1': [
-      { value: '101', label: '文本生成' },
-      { value: '102', label: '图像识别' },
-      { value: '103', label: '语音转换' }
+      { value: '1001', label: 'bilibili_video_content' },
+      { value: '1002', label: 'bilibili_search' }
     ],
     '2': [
-      { value: '201', label: '文档转换' },
-      { value: '202', label: '图片压缩' },
-      { value: '203', label: '视频处理' }
+      { value: '2001', label: 'dy_hot_video' }
     ],
     '3': [
-      { value: '301', label: '数据挖掘' },
-      { value: '302', label: '统计分析' },
-      { value: '303', label: '机器学习' }
+      { value: '3001', label: 'download_url_to_content' },
+      { value: '3002', label: 'dy_video_data' },
+      { value: '3003', label: 'dy_video_download' },
+      { value: '3004', label: 'ks_video_download' },
+      { value: '3005', label: 'ks_vido_data' },
+      { value: '3006', label: 'xhs_note_data' }
     ],
     '4': [
-      { value: '401', label: '存储服务' },
-      { value: '402', label: '计算服务' },
-      { value: '403', label: '网络服务' }
+      { value: '4001', label: 'dy_hot_search' }
     ]
   };
   
@@ -94,14 +77,9 @@ export default function UsageMonitor({ isAdmin = false, userApiKey, apiBaseUrl }
     try {
       const queryApiKey = filters.apiKey || userApiKey || '';
       
-      let url: string;
-      let requestOptions: RequestInit;
-      
       if (isAdmin) {
-        // 管理员模式：使用POST请求
-        url = `${apiBaseUrl}/api/points/usage/monitor`;
-        
-        const requestBody = {
+        // 管理员模式：使用统一的API函数
+        const requestData = {
           apiKey: queryApiKey,
           deductionType: filters.deductionType ? parseInt(filters.deductionType) : null,
           deductionSubtype: filters.deductionSubtype ? parseInt(filters.deductionSubtype) : null,
@@ -109,52 +87,42 @@ export default function UsageMonitor({ isAdmin = false, userApiKey, apiBaseUrl }
           endTime: filters.endDate ? new Date(filters.endDate).toISOString() : null
         };
         
-        requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody)
-        };
-      } else {
-        // 用户模式：使用GET请求
-        const params = new URLSearchParams({
-          apiKey: queryApiKey
-        });
+        console.log('发送管理员积分监控请求:', requestData);
         
-        if (filters.deductionType) {
-          params.append('deductionType', filters.deductionType);
-        }
-        if (filters.deductionSubtype) {
-          params.append('deductionSubtype', filters.deductionSubtype);
-        }
-        if (filters.startDate) {
-          params.append('startTime', new Date(filters.startDate).toISOString());
-        }
-        if (filters.endDate) {
-          params.append('endTime', new Date(filters.endDate).toISOString());
-        }
+        const result = await pointsApi.getUsageMonitor(requestData);
         
-        url = `${apiBaseUrl}/api/points/usage/my-monitor?${params.toString()}`;
-        requestOptions = {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        };
-      }
-      
-      const response = await fetch(url, requestOptions);
-      const result = await response.json();
-      
-      if (result.success) {
-        setData(result.data);
+        if (result.success) {
+          setData(result.data!);
+        } else {
+          setError(result.message || '获取数据失败');
+        }
       } else {
-        setError(result.message || '获取数据失败');
+        // 用户模式：使用统一的API函数
+        const params = {
+          apiKey: queryApiKey,
+          ...(filters.deductionType && { deductionType: filters.deductionType }),
+          ...(filters.deductionSubtype && { deductionSubtype: filters.deductionSubtype }),
+          ...(filters.startDate && { startTime: new Date(filters.startDate).toISOString() }),
+          ...(filters.endDate && { endTime: new Date(filters.endDate).toISOString() })
+        };
+        
+        console.log('发送用户积分监控请求:', params);
+        
+        const result = await pointsApi.getMyUsageMonitor(params);
+        
+        if (result.success) {
+          setData(result.data!);
+        } else {
+          setError(result.message || '获取数据失败');
+        }
       }
     } catch (err) {
       console.error('获取用量数据失败:', err);
-      setError('网络请求失败，请稍后重试');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('网络请求失败，请稍后重试');
+      }
     } finally {
       setLoading(false);
     }

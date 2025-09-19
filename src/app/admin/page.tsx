@@ -174,7 +174,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
-    tokenUtils.removeToken();
+    tokenUtils.removeAdminToken();
     router.push('/admin/login');
   };
 

@@ -6,7 +6,7 @@
  */
 export class ApiConfig {
   // 默认API服务器地址（HTTP后端服务）
-  private static readonly DEFAULT_HTTP_API_URL = 'http://129.211.92.125:1009/api';
+  private static readonly DEFAULT_HTTP_API_URL = 'http://localhost:1009/api';
   
   // 环境配置映射
   private static readonly ENV_CONFIGS = {
@@ -14,10 +14,10 @@ export class ApiConfig {
     local: '/api/proxy',
     
     // 远程开发服务器 - 直接访问 HTTP 后端
-    dev: 'http://129.211.92.125:1009/api',
+    dev: 'http://localhost:1009/api',
     
     // 测试环境 - 直接访问 HTTP 后端
-    test: 'http://129.211.92.125:1009/api',
+    test: 'http://localhost:1009/api',
     
     // 生产环境 - 使用反向代理
     prod: '/api',
@@ -26,7 +26,7 @@ export class ApiConfig {
     vercel: '/api/proxy',
     
     // GitHub Pages 部署 - 需要外部代理服务
-    github: 'https://your-cors-proxy.herokuapp.com/http://129.211.92.125:1009/api'
+    github: 'https://your-cors-proxy.herokuapp.com/http://localhost:1009/api'
   };
 
   /**

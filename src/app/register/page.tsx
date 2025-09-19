@@ -81,7 +81,14 @@ export default function RegisterPage() {
         // 立即跳转到登录页面
         router.push("/login");
       } else {
-        setError(response.message || "注册失败");
+        // 检查是否为IP限流错误
+        const errorMessage = response.message || "注册失败";
+        if (errorMessage.includes("同一IP地址每天最多只能注册")) {
+          // IP限流错误，提供更友好的提示
+          setError(`${errorMessage}\n\n💡 建议：\n• 如需注册更多账号，请明天再试\n• 或联系客服获取帮助`);
+        } else {
+          setError(errorMessage);
+        }
       }
     } catch (err: any) {
       console.error("Register error:", err);
