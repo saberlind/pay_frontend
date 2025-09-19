@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 // UI组件已替换为内联样式实现
 import { adminApi, User, tokenUtils, notificationApi } from '@/lib/api';
+import { getCompatibleApiUrl } from '@/config/api';
 import AdminChatPanel from '@/components/AdminChatPanel';
 import UsageMonitor from '@/components/UsageMonitor';
 import { Search, Plus, LogOut, Smartphone, Users, MessageCircle, BarChart3 } from 'lucide-react';
@@ -781,7 +782,7 @@ export default function AdminPage() {
           <div>
             <UsageMonitor 
               isAdmin={true}
-              token={tokenUtils.getAdminToken() || ''}
+              apiBaseUrl={getCompatibleApiUrl()}
             />
           </div>
         )}
