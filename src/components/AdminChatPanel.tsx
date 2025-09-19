@@ -35,23 +35,28 @@ export default function AdminChatPanel({ token }: AdminChatPanelProps) {
   // 加载会话列表
   const loadSessions = async () => {
     try {
-      // 这里需要添加获取会话列表的API
       console.log('加载会话列表...');
-      // 暂时使用模拟数据
-      const mockSessions: ChatSession[] = [
-        {
-          id: 1,
-          apiKey: '23f12298-7b37-43c4-b992-0b57177adc26',
-          userPhone: '17350059820',
-          status: 'active',
-          lastMessageAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
-      ];
-      setSessions(mockSessions);
+      const response = await chatApi.getAllSessions(token);
+      if (response.success && response.data) {
+        // 转换后端数据格式为前端需要的格式
+        const formattedSessions: ChatSession[] = response.data.map((session: any) => ({
+          id: session.id,
+          apiKey: session.apiKey,
+          userPhone: session.userPhone,
+          status: session.status,
+          lastMessageAt: session.lastMessageAt || session.createdAt,
+          createdAt: session.createdAt,
+          updatedAt: session.updatedAt,
+        }));
+        setSessions(formattedSessions);
+        console.log('会话列表加载成功:', formattedSessions.length, '个会话');
+      } else {
+        console.error('获取会话列表失败:', response.message);
+        setSessions([]);
+      }
     } catch (error) {
       console.error('加载会话列表失败:', error);
+      setSessions([]);
     }
   };
 

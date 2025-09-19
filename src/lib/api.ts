@@ -539,5 +539,15 @@ export const chatApi = {
         'Authorization': `Bearer ${token}`
       }
     });
+  },
+
+  // 获取所有会话列表（管理员专用）
+  getAllSessions: async (token: string): Promise<ApiResponse<any[]>> => {
+    return request('/chat/sessions', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
   }
 };
