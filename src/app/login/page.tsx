@@ -72,8 +72,9 @@ export default function LoginPage() {
         console.log("登录失败:", response.message);
         setError(response.message || "登录失败");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login error:", err);
+      // 网络连接错误或其他异常情况
       setError("网络错误，请稍后重试");
     } finally {
       setLoading(false);

@@ -80,13 +80,27 @@ async function request<T>(
   const response = await fetch(fullUrl, config);
   console.log("API响应状态:", response.status, response.statusText);
   
-  if (!response.ok) {
-    console.error("API请求失败:", response.status, response.statusText);
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
   const data = await response.json();
   console.log("API响应数据:", data);
+  
+  if (!response.ok) {
+    console.error("API请求失败:", response.status, response.statusText);
+    // 如果响应包含错误信息，返回包含错误信息的响应对象
+    if (data && data.message) {
+      return {
+        success: false,
+        message: data.message,
+        data: null
+      } as ApiResponse<T>;
+    }
+    // 如果没有具体错误信息，返回通用错误
+    return {
+      success: false,
+      message: `请求失败 (${response.status})`,
+      data: null
+    } as ApiResponse<T>;
+  }
+
   return data;
 }
 

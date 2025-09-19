@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // Dialog组件已替换为自定义实现
 import { tokenUtils, authApi, AuthResponse, notificationApi } from '@/lib/api';
 import ChatWidget from '@/components/ChatWidget';
+import UsageMonitor from '@/components/UsageMonitor';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
   const [sseConnected, setSseConnected] = useState(false);
   const [pointsUpdated, setPointsUpdated] = useState(false);
   const [usingPolling, setUsingPolling] = useState(false);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'usage'>('dashboard');
   const sseRef = useRef<EventSource | null>(null);
   const chatPollingRef = useRef<NodeJS.Timeout | null>(null);
   const pointsPollingRef = useRef<NodeJS.Timeout | null>(null);
@@ -359,24 +361,6 @@ export default function HomePage() {
             <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
               欢迎，{user?.username || '用户'}
             </span>
-            {/* 连接状态指示器 */}
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "0.5rem",
-              fontSize: "12px",
-              color: "rgba(255, 255, 255, 0.7)"
-            }}>
-              <div style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                backgroundColor: sseConnected ? "#10b981" : usingPolling ? "#f59e0b" : "#ef4444"
-              }}></div>
-              <span>
-                {sseConnected ? "实时连接" : usingPolling ? "轮询模式" : "连接中..."}
-              </span>
-            </div>
             <Button
               variant="outline"
               onClick={handleLogout}
@@ -417,20 +401,72 @@ export default function HomePage() {
         style={{
           flex: 1,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: "column",
           padding: "2rem",
         }}
       >
+        {/* 标签页导航 */}
+        <div
+          style={{
+            maxWidth: "1200px",
+            width: "100%",
+            margin: "0 auto 2rem auto",
+            display: "flex",
+            gap: "1rem",
+            borderBottom: "1px solid #E5E7EB",
+          }}
+        >
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            style={{
+              padding: "0.75rem 1.5rem",
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "500",
+              color: activeTab === 'dashboard' ? '#4F46E5' : '#6B7280',
+              borderBottom: activeTab === 'dashboard' ? '2px solid #4F46E5' : '2px solid transparent',
+              transition: "all 0.2s ease",
+            }}
+          >
+            📊 控制台
+          </button>
+          <button
+            onClick={() => setActiveTab('usage')}
+            style={{
+              padding: "0.75rem 1.5rem",
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "500",
+              color: activeTab === 'usage' ? '#4F46E5' : '#6B7280',
+              borderBottom: activeTab === 'usage' ? '2px solid #4F46E5' : '2px solid transparent',
+              transition: "all 0.2s ease",
+            }}
+          >
+            📈 用量监控
+          </button>
+        </div>
+
+        {/* 内容区域 */}
         <div
           style={{
             width: "100%",
             maxWidth: "1200px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-            gap: "2rem",
+            margin: "0 auto",
+            flex: 1,
           }}
         >
+          {activeTab === 'dashboard' && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+                gap: "2rem",
+              }}
+            >
           {/* 用户信息卡片 */}
           <div
             style={{
@@ -688,6 +724,16 @@ export default function HomePage() {
               <li style={{ marginBottom: "0.5rem" }}>安全可靠的支付环境</li>
             </ul>
           </div> */}
+            </div>
+          )}
+          
+          {activeTab === 'usage' && (
+            <UsageMonitor 
+              isAdmin={false}
+              userApiKey={user?.apiKey}
+              apiBaseUrl={process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}
+            />
+          )}
         </div>
       </main>
 

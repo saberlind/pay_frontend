@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 // UI组件已替换为内联样式实现
 import { adminApi, User, tokenUtils, notificationApi } from '@/lib/api';
 import AdminChatPanel from '@/components/AdminChatPanel';
-import { Search, Plus, LogOut, Smartphone, Users, MessageCircle } from 'lucide-react';
+import UsageMonitor from '@/components/UsageMonitor';
+import { Search, Plus, LogOut, Smartphone, Users, MessageCircle, BarChart3 } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function AdminPage() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'addPoints' | 'chat'>('addPoints');
+  const [activeTab, setActiveTab] = useState<'addPoints' | 'chat' | 'usage'>('addPoints');
   const [sseConnected, setSseConnected] = useState(false);
   const [usingPolling, setUsingPolling] = useState(false);
   const sseRef = useRef<EventSource | null>(null);
@@ -354,7 +355,7 @@ export default function AdminPage() {
       <div
         style={{
           padding: "1.5rem 1rem",
-          maxWidth: activeTab === 'chat' ? "1200px" : "400px",
+          maxWidth: activeTab === 'chat' || activeTab === 'usage' ? "1200px" : "400px",
           margin: "0 auto",
         }}
       >
@@ -414,6 +415,28 @@ export default function AdminPage() {
           >
             <MessageCircle style={{ width: "16px", height: "16px" }} />
             客服聊天
+          </button>
+          <button
+            onClick={() => setActiveTab('usage')}
+            style={{
+              flex: 1,
+              padding: "0.75rem 1rem",
+              borderRadius: "0.75rem",
+              border: "none",
+              background: activeTab === 'usage' ? "#2563EB" : "transparent",
+              color: activeTab === 'usage' ? "white" : "#6B7280",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              transition: "all 0.2s",
+            }}
+          >
+            <BarChart3 style={{ width: "16px", height: "16px" }} />
+            用量监控
           </button>
         </div>
 
@@ -748,10 +771,18 @@ export default function AdminPage() {
             </form>
           </div>
           </div>
-        ) : (
+        ) : activeTab === 'chat' ? (
           /* 聊天标签页内容 */
           <div>
             <AdminChatPanel token={tokenUtils.getAdminToken() || ''} />
+          </div>
+        ) : (
+          /* 用量监控标签页内容 */
+          <div>
+            <UsageMonitor 
+              isAdmin={true}
+              token={tokenUtils.getAdminToken() || ''}
+            />
           </div>
         )}
       </div>

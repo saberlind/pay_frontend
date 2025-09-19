@@ -83,8 +83,9 @@ export default function RegisterPage() {
       } else {
         setError(response.message || "注册失败");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Register error:", err);
+      // 网络连接错误或其他异常情况
       setError("网络错误，请稍后重试");
     } finally {
       setLoading(false);

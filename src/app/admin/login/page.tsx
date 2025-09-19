@@ -33,9 +33,10 @@ export default function AdminLoginPage() {
       } else {
         setError(response.message || '登录失败');
       }
-    } catch (err) {
-      setError('登录失败，请检查网络连接');
+    } catch (err: any) {
       console.error('Admin login error:', err);
+      // 网络连接错误或其他异常情况
+      setError('网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }

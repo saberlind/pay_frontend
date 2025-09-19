@@ -116,10 +116,12 @@ export default function ForgotPasswordPage() {
         // 立即跳转到登录页面
         router.push("/login");
       } else {
+        // 显示后端返回的具体错误信息
         setError(data.message || "密码重置失败");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Password reset error:", err);
+      // 网络连接错误或其他异常情况
       setError("网络错误，请稍后重试");
     } finally {
       setLoading(false);
