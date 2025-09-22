@@ -163,7 +163,8 @@ export default function HomePage() {
       case 'points_update':
         try {
           const data = JSON.parse(event.data);
-          showToastMessage(`💰 ${data.message}`, 5000); // 点数更新消息显示5秒
+          const message = data.message || `您的账户点数已更新，当前余额: ${data.newPoints || 0} 点`;
+          showToastMessage(`💰 ${message}`, 5000); // 点数更新消息显示5秒
           
           // 方法1: 直接更新用户点数（快速响应）
           if (user) {

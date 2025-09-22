@@ -133,8 +133,9 @@ export default function UsageMonitor({ isAdmin = false, userApiKey, apiBaseUrl }
    */
   const setQuickDateRange = (days: number) => {
     const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 1); // 结束时间设置为当前日期+1天
     const startDate = new Date();
-    startDate.setDate(endDate.getDate() - days);
+    startDate.setDate(endDate.getDate() - days - 1); // 相应调整开始时间
     
     setFilters(prev => ({
       ...prev,

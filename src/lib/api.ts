@@ -514,14 +514,13 @@ export const notificationApi = {
           // 如果点数发生变化，触发通知
           if (lastPoints !== null && lastPoints !== currentPoints) {
             console.log('点数发生变化:', lastPoints, '->', currentPoints);
-            // 模拟SSE事件格式
+            const addedPoints = currentPoints - lastPoints;
+            // 模拟SSE事件格式，保持与真实SSE事件数据结构一致
             const mockEvent = {
               data: JSON.stringify({
-                type: 'points_update',
-                points: currentPoints,
-                previousPoints: lastPoints,
-                username: response.data.username,
-                timestamp: response.data.timestamp
+                newPoints: currentPoints,
+                addedPoints: addedPoints,
+                message: `您的账户点数已更新，当前余额: ${currentPoints} 点${addedPoints > 0 ? `（新增 ${addedPoints} 点）` : addedPoints < 0 ? `（消耗 ${Math.abs(addedPoints)} 点）` : ''}`
               }),
               type: 'points_update'
             };
