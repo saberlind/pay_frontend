@@ -937,7 +937,7 @@ export default function HomePage() {
                 border: "1px solid #E5E7EB",
               }}
             >
-              💡 完成支付后，请联系客服添加点数
+              💡 完成支付后，请联系客服添加点数（10元=100点数）
             </div>
           </div>
         </div>
